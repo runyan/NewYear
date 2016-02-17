@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="ItemArray">
+        <item>图库</item>
+        <item>相机</item>
+    </array>
+</resources>

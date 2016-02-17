@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">新年好</string>
+    <string name="wish">写下你的新年愿望</string>
+    <string name="weibo_not_installed">未安装微博客户端</string>
+    <string name="weibo_not_supported">不支持的微博客户端</string>
+    <string name="share_success">分享成功</string>
+    <string name="share_cancel">分享取消</string>
+    <string name="share_fail">分享失败</string>
+    <string name="wish_text">新年好</string>
+</resources>

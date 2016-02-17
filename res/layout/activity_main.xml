@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    tools:context="com.imooc.run.newyear.MainActivity">
+
+    <ImageView
+        android:id="@+id/photo"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp"
+        android:background="@color/red"
+        android:padding="3dp"
+        android:src="@drawable/select"
+        android:contentDescription="@string/app_name"/>
+
+    <EditText
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/photo"
+        android:hint="@string/wish"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/text"
+        android:gravity="center"
+        android:maxLength="20"
+        android:textSize="25sp"
+        android:textColor="@color/yellow"/>
+
+    <Button
+        android:id="@+id/wechat_share_friend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/share_friend"
+        android:layout_below="@+id/text"
+        android:layout_marginStart="60dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginTop="30dp" />
+
+    <Button
+        android:id="@+id/wechat_share_timeline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/share_timeline"
+        android:layout_below="@+id/text"
+        android:layout_toRightOf="@id/wechat_share_friend"
+        android:layout_toEndOf="@id/wechat_share_friend"
+        android:layout_marginStart="40dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="30dp" />
+    
+    <Button
+        android:id="@+id/weibo_share"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/share_weibo"
+        android:layout_below="@+id/text"
+        android:layout_toRightOf="@id/wechat_share_timeline"
+        android:layout_toEndOf="@id/wechat_share_timeline"
+        android:layout_marginStart="40dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="30dp" />
+
+</RelativeLayout>
