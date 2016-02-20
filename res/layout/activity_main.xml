@@ -15,7 +15,8 @@
         android:background="@color/red"
         android:padding="3dp"
         android:src="@drawable/default_bg"
-        android:contentDescription="@string/app_name"/>
+        android:contentDescription="@string/app_name"
+        android:adjustViewBounds="true"/>
 
     <EditText
         android:id="@+id/text"
@@ -27,9 +28,17 @@
         android:gravity="center"
         android:hint="@string/wish"
         android:background="@drawable/word"
-        android:maxLength="20"
+        android:maxLength="10"
         android:textSize="20sp"
         android:textColor="@color/yellow"/>
+
+    <TextView
+        android:id="@+id/text_length"
+        android:layout_below="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <Button
         android:id="@+id/wechat_share_friend"
