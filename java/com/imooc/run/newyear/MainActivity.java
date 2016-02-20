@@ -8,15 +8,20 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.imooc.run.newyear.Util.Util;
 import com.imooc.run.newyear.constants.Constants;
 import com.imooc.run.newyear.constants.WeChatConstants;
 import com.imooc.run.newyear.constants.WeiboConstants;
@@ -60,22 +65,29 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
     private Button mWeChatShareFriend;
     private Button mWeiboShare;
     private EditText mWishText;
+    private TextView mTextLength;
 
     private IWXAPI iwxapi; //微信分享接口实例
     private IWeiboShareAPI iWeiboShareAPI; //微博分享接口实例
 
-    private int flag; //微信分享时分享到朋友圈或者微信好友的标识
     private String mFilePath; //相机拍照后图片的保存位置
+
+    private int maxTextLength = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (!versionCheck()) {
+            Toast.makeText(MainActivity.this, R.string.version_error, Toast.LENGTH_LONG).show();
+            this.finish();
+        }
+
         initViews(); //初始化显示控件;
 
         //初始化保存位置
-        mFilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM + "/Camera").toString() + "/" + "img.png";
+        mFilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/Camera" + "/" + "img.png";
 
         //注册app到微博，微信
         regtoWX();
@@ -97,11 +109,24 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      */
 
     /**
+     * 判断安卓版本是否小于4.0
+     *
+     * @return true 如果安卓版本大于4.0, false 如果安卓版本小于4.0
+     */
+    public boolean versionCheck() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
+    }
+
+    /**
      * 初始化显示界面
      */
     private void initViews() {
         mWishText = (EditText) findViewById(R.id.text);
         setTextStyle();
+        mWishText.addTextChangedListener(mTextWatcher);
+
+        mTextLength = (TextView) findViewById(R.id.text_length);
+        mTextLength.setText(R.string.text_length_hint);
 
         mPhoto = (ImageView) findViewById(R.id.photo);
         mPhoto.setOnClickListener(new View.OnClickListener() {
@@ -131,9 +156,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWeChatShareTimeLine.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                flag = 0;
-                weChatShare(flag);
-                setVisible();
+                weChatAction(0);
             }
         });
 
@@ -141,9 +164,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWeChatShareFriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                flag = 1;
-                weChatShare(flag);
-                setVisible();
+                weChatAction(1);
             }
         });
 
@@ -151,16 +172,38 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWeiboShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    sendMessage(true, true, false, false, false, false);
-                    setVisible();
-                } catch (WeiboException e) {
-                    e.printStackTrace();
-                    Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
+                weiBoAction();
             }
         });
     }
+
+    TextWatcher mTextWatcher = new TextWatcher() {
+
+        private CharSequence temp;
+        int remainTextLength = maxTextLength;
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            temp = s;
+            if (remainTextLength >= 0) {
+                remainTextLength = maxTextLength - temp.length();
+            }
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            String str = "还能输入" + remainTextLength + "个字";
+            mTextLength.setText(str);
+            if (temp.length() >= 10) {
+                Toast.makeText(MainActivity.this, R.string.text_too_long, Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
 
     /**
      * 注册微信分享api
@@ -197,6 +240,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWeChatShareFriend.setVisibility(View.VISIBLE);
         mWeChatShareTimeLine.setVisibility(View.VISIBLE);
         mWeiboShare.setVisibility(View.VISIBLE);
+        mTextLength.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -206,6 +250,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWeChatShareFriend.setVisibility(View.INVISIBLE);
         mWeChatShareTimeLine.setVisibility(View.INVISIBLE);
         mWeiboShare.setVisibility(View.INVISIBLE);
+        mTextLength.setVisibility(View.INVISIBLE);
     }
 
     /**
@@ -304,9 +349,34 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
 //        }
 //    }
 
-    /*
-        微信分享部分
+    /**
+     * 微信分享部分
      */
+
+    /**
+     * 判断微信是否安装
+     *
+     * @return true 微信已安装 false 微信未安装
+     */
+    private boolean checkWXInsatlled() {
+        return iwxapi.isWXAppInstalled();
+    }
+
+    /**
+     * 处理微信分享动作
+     *
+     * @param flag 0为分享到朋友圈 1为分享给微信好友
+     */
+    private void weChatAction(int flag) {
+        if (!Util.checkFastDoubleClick()) {
+            if (!checkWXInsatlled()) {
+                Toast.makeText(MainActivity.this, R.string.weichat_not_installed, Toast.LENGTH_SHORT).show();
+            } else {
+                weChatShare(flag);
+                setVisible();
+            }
+        }
+    }
 
     /**
      * 微信分享
@@ -345,6 +415,34 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
          * {@link IWeiboHandler.Response#onResponse}；失败返回 false，不调用上述回调
          */
         iWeiboShareAPI.handleWeiboResponse(intent, this);
+    }
+
+    /**
+     * 检查微博客户端是否安装
+     *
+     * @return true 已安装微博客户端 false 未安装微博客户端
+     */
+    private boolean checkWBInstalled() {
+        return iWeiboShareAPI.isWeiboAppInstalled();
+    }
+
+    /**
+     * 处理微博分享动作
+     */
+    private void weiBoAction() {
+        try {
+            if (!Util.checkFastDoubleClick()) {
+                if (!checkWBInstalled()) {
+                    Toast.makeText(MainActivity.this, R.string.weibo_not_installed, Toast.LENGTH_SHORT).show();
+                } else {
+                    sendMessage(true, true, false, false, false, false);
+                    setVisible();
+                }
+            }
+        } catch (WeiboException e) {
+            e.printStackTrace();
+            Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
