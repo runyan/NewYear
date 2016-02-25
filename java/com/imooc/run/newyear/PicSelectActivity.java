@@ -39,7 +39,7 @@ public class PicSelectActivity extends Activity {
 
         initView();
 
-        Toast.makeText(PicSelectActivity.this, getResources().getString(R.string.long_press_hint1), Toast.LENGTH_SHORT).show();
+        Toast.makeText(PicSelectActivity.this, getString(R.string.long_press_hint), Toast.LENGTH_SHORT).show();
     }
 
     private void initView() {
