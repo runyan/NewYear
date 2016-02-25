@@ -2,13 +2,13 @@ package com.imooc.run.newyear;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -24,7 +24,7 @@ import android.widget.Toast;
 import com.imooc.run.newyear.Util.Util;
 import com.imooc.run.newyear.constants.Constants;
 import com.imooc.run.newyear.constants.WeChatConstants;
-import com.imooc.run.newyear.constants.WeiboConstants;
+import com.imooc.run.newyear.constants.WeiBoConstants;
 import com.sina.weibo.sdk.api.ImageObject;
 import com.sina.weibo.sdk.api.MusicObject;
 import com.sina.weibo.sdk.api.TextObject;
@@ -63,35 +63,45 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
     private ImageView mPhoto;
     private Button mWeChatShareTimeLine;
     private Button mWeChatShareFriend;
-    private Button mWeiboShare;
+    private Button mWeiBoShare;
     private EditText mWishText;
     private TextView mTextLength;
 
     private IWXAPI iwxapi; //微信分享接口实例
-    private IWeiboShareAPI iWeiboShareAPI; //微博分享接口实例
+    private IWeiboShareAPI iWeiBoShareAPI; //微博分享接口实例
+
+    private Context mContext;
+    private AlertDialog.Builder mAlertBuilder;
+    private AlertDialog.Builder mSelectBuilder;
 
     private String mFilePath; //相机拍照后图片的保存位置
 
-    private int maxTextLength = 10;
+    private final int maxTextLength = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (!versionCheck()) {
+        mContext = MainActivity.this;
+
+        mAlertBuilder = new AlertDialog.Builder(mContext);
+        mSelectBuilder = new AlertDialog.Builder(mContext);
+
+        if (!Util.versionCheck()) {
             Toast.makeText(MainActivity.this, R.string.version_error, Toast.LENGTH_LONG).show();
-            this.finish();
+            Util.exit(this);
         }
 
         initViews(); //初始化显示控件;
 
         //初始化保存位置
-        mFilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/Camera" + "/" + "img.png";
+        mFilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString()
+                + "/Camera" + "/" + "img.png";
 
         //注册app到微博，微信
-        regtoWX();
-        regtoWB();
+        regToWX();
+        regToWB();
 
         /**
          * 当 Activity 被重新初始化时（该 Activity 处于后台时，可能会由于内存不足被杀掉了），
@@ -100,8 +110,14 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
          * 失败返回 false，不调用上述回调
          */
         if (savedInstanceState != null) {
-            iWeiboShareAPI.handleWeiboResponse(getIntent(), this);
+            iWeiBoShareAPI.handleWeiboResponse(getIntent(), this);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Util.exit(this);
     }
 
     /**
@@ -109,21 +125,64 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      */
 
     /**
-     * 判断安卓版本是否小于4.0
-     *
-     * @return true 如果安卓版本大于4.0, false 如果安卓版本小于4.0
-     */
-    public boolean versionCheck() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
-    }
-
-    /**
      * 初始化显示界面
      */
     private void initViews() {
         mWishText = (EditText) findViewById(R.id.text);
         setTextStyle();
-        mWishText.addTextChangedListener(mTextWatcher);
+        mWishText.addTextChangedListener(mTextWatcher); //为文本添加监听事件
+        mWishText.setOnClickListener(new View.OnClickListener() { //输入框的点击事件
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(mContext, getResources().getString(R.string.long_press_hint2), Toast.LENGTH_SHORT)
+                        .show();
+                if (0 == Util.getTextLength(mWishText)) { //当输入框中没有文本时，弹出选择框
+                    //默认祝福语
+                    final String[] wishTexts = getResources().getStringArray(R.array.WishTextItemArray);
+                    mAlertBuilder.setItems(getResources().getStringArray(R.array.WishTextItemSelectionArray), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which) {
+                                case 0: {  //选择默认祝福语
+                                    //默认祝福语选择对话框
+                                    mSelectBuilder.setTitle(getResources().getString(R.string.wish_text_selection))
+                                            .setSingleChoiceItems(wishTexts, 0, new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    mWishText.setText(wishTexts[which]); //设置默认祝福语到输入框
+                                                    dialog.dismiss(); //关闭对话框
+                                                    Util.closeInputMethod(mContext, mWishText); //选择祝福语后关闭屏幕键盘
+                                                }
+                                            });
+                                    mSelectBuilder.show();
+                                    break;
+                                }
+                                case 1: { //选择输入祝福语
+                                    //输入框获得焦点
+                                    mWishText.setFocusable(true);
+                                    mWishText.requestFocus();
+                                    break;
+                                }
+                            }
+                        }
+                    });
+                    mAlertBuilder.show();
+                }
+            }
+        });
+
+        mWishText.setOnLongClickListener(new View.OnLongClickListener() { //长按输入框清空文本
+            @Override
+            public boolean onLongClick(View v) {
+                if (0 != Util.getTextLength(mWishText)) { //如果输入框内有内容则清空
+                    mWishText.setText("");
+                    Util.vibrate(MainActivity.this, 1);
+                } else { //如果输入框内没有内容弹出提示信息
+                    Toast.makeText(mContext, getResources().getString(R.string.text_is_null), Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            }
+        });
 
         mTextLength = (TextView) findViewById(R.id.text_length);
         mTextLength.setText(R.string.text_length_hint);
@@ -132,23 +191,31 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setItems(getResources().getStringArray(R.array.ItemArray), new DialogInterface.OnClickListener() { //选择图片位置
+                mAlertBuilder.setItems(getResources().getStringArray(R.array.GalleryItemSelectionArray), new DialogInterface.OnClickListener() { //选择图片位置
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (0 == which) { //选择系统图库
-                            Intent intent = new Intent(Intent.ACTION_PICK, null);
-                            intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-                            startActivityForResult(intent, Constants.REQ_ALBUM);
-                        } else { //选择相机
-                            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                            Uri photoUri = Uri.fromFile(new File(mFilePath));
-                            intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
-                            startActivityForResult(intent, Constants.REQ_CAMERA);
+                        switch (which) {
+                            case 0: { //选择系统图库
+                                Intent intent = new Intent(Intent.ACTION_PICK, null);
+                                intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+                                startActivityForResult(intent, Constants.REQ_ALBUM);
+                                break;
+                            }
+                            case 1: {//选择相机
+                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                Uri photoUri = Uri.fromFile(new File(mFilePath));
+                                intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+                                startActivityForResult(intent, Constants.REQ_CAMERA); //拍照并保存照片
+                                break;
+                            }
+                            case 2: {//选择默认图片
+                                Intent intent = new Intent(MainActivity.this, PicSelectActivity.class);
+                                startActivityForResult(intent, Constants.REQ_DEFAULT);
+                            }
                         }
                     }
                 });
-                builder.show();
+                mAlertBuilder.show();
             }
         });
 
@@ -168,8 +235,8 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
             }
         });
 
-        mWeiboShare = (Button) findViewById(R.id.weibo_share);
-        mWeiboShare.setOnClickListener(new View.OnClickListener() {
+        mWeiBoShare = (Button) findViewById(R.id.weibo_share);
+        mWeiBoShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 weiBoAction();
@@ -177,10 +244,11 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         });
     }
 
-    TextWatcher mTextWatcher = new TextWatcher() {
+    //文本事件监听类
+    private final TextWatcher mTextWatcher = new TextWatcher() {
 
-        private CharSequence temp;
-        int remainTextLength = maxTextLength;
+        private CharSequence temp; //文本内容
+        private int remainTextLength = maxTextLength; //可以输入的字符长度
 
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -200,7 +268,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
             String str = "还能输入" + remainTextLength + "个字";
             mTextLength.setText(str);
             if (temp.length() >= 10) {
-                Toast.makeText(MainActivity.this, R.string.text_too_long, Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, R.string.text_too_long, Toast.LENGTH_SHORT).show();
             }
         }
     };
@@ -208,21 +276,24 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
     /**
      * 注册微信分享api
      */
-    private void regtoWX() {
+    private void regToWX() {
         //通过WXAPIFactory工厂，获取IWXAPI的实例
-        iwxapi = WXAPIFactory.createWXAPI(this, WeChatConstants.APP_ID, false);
+        iwxapi = WXAPIFactory.createWXAPI(mContext, WeChatConstants.APP_ID, false);
         //将应用的appId注册到微信
         iwxapi.registerApp(WeChatConstants.APP_ID);
     }
 
-    private void regtoWB() {
+    /**
+     * 注册微博分享api
+     */
+    private void regToWB() {
         //实例化微博分享接口实例
-        iWeiboShareAPI = WeiboShareSDK.createWeiboAPI(this, WeiboConstants.APP_KEY);
+        iWeiBoShareAPI = WeiboShareSDK.createWeiboAPI(mContext, WeiBoConstants.APP_KEY);
         /**
          * 注册第三方应用到微博客户端中，注册成功后该应用将显示在微博的应用列表中。
          * NOTE：请务必提前注册，即界面初始化的时候或是应用程序初始化时，进行注册
          */
-        iWeiboShareAPI.registerApp();
+        iWeiBoShareAPI.registerApp();
     }
 
     /**
@@ -239,7 +310,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
     private void setVisible() {
         mWeChatShareFriend.setVisibility(View.VISIBLE);
         mWeChatShareTimeLine.setVisibility(View.VISIBLE);
-        mWeiboShare.setVisibility(View.VISIBLE);
+        mWeiBoShare.setVisibility(View.VISIBLE);
         mTextLength.setVisibility(View.VISIBLE);
     }
 
@@ -249,7 +320,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
     private void setInvisible() {
         mWeChatShareFriend.setVisibility(View.INVISIBLE);
         mWeChatShareTimeLine.setVisibility(View.INVISIBLE);
-        mWeiboShare.setVisibility(View.INVISIBLE);
+        mWeiBoShare.setVisibility(View.INVISIBLE);
         mTextLength.setVisibility(View.INVISIBLE);
     }
 
@@ -264,7 +335,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == RESULT_OK) { //如果返回成功
+        if (resultCode == RESULT_OK) { //如果使用相机或图库返回成功
             if (requestCode == Constants.REQ_ALBUM) { //如果使用系统图库
                 if (null != data) {
                     mPhoto.setImageURI(data.getData());
@@ -275,7 +346,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                     fis = new FileInputStream(mFilePath); //获取照片的输入流
                     Bitmap bitmap = BitmapFactory.decodeStream(fis); //从照片的输入流中将图片解码为Bitmap
                     mPhoto.setImageBitmap(bitmap); //设置显示图片
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);//询问是否将图片保存在图库的对话框
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);//询问是否将图片保存在图库的对话框
                     builder.setMessage(R.string.save_photo);
                     builder.setPositiveButton(R.string.yes, null);
                     builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() { //如果不保存
@@ -283,7 +354,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                         public void onClick(DialogInterface dialog, int which) {
                             File f = new File(mFilePath);
                             if (!f.delete()) { //将图片从图库中删除
-                                Toast.makeText(MainActivity.this, R.string.delete_fail, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mContext, R.string.delete_fail, Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
@@ -299,6 +370,13 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                         e.printStackTrace();
                     }
                 }
+            }
+        }
+
+        if (requestCode == Constants.REQ_DEFAULT) { //选择默认图片返回成功
+            if (resultCode == Constants.DEFAULT_RESULT) {
+                int picId = Integer.parseInt(data.getStringExtra("picId")); //获得所选图片
+                mPhoto.setImageDrawable(Util.getDrawable(mContext, picId));
             }
         }
     }
@@ -358,7 +436,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      *
      * @return true 微信已安装 false 微信未安装
      */
-    private boolean checkWXInsatlled() {
+    private boolean checkWXInstalled() {
         return iwxapi.isWXAppInstalled();
     }
 
@@ -368,13 +446,11 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      * @param flag 0为分享到朋友圈 1为分享给微信好友
      */
     private void weChatAction(int flag) {
-        if (!Util.checkFastDoubleClick()) {
-            if (!checkWXInsatlled()) {
-                Toast.makeText(MainActivity.this, R.string.weichat_not_installed, Toast.LENGTH_SHORT).show();
-            } else {
-                weChatShare(flag);
-                setVisible();
-            }
+        if (!checkWXInstalled()) {
+            Toast.makeText(mContext, R.string.weiChat_not_installed, Toast.LENGTH_SHORT).show();
+        } else {
+            weChatShare(flag);
+            setVisible();
         }
     }
 
@@ -414,7 +490,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
          * 来接收微博客户端返回的数据；执行成功，返回 true，并调用
          * {@link IWeiboHandler.Response#onResponse}；失败返回 false，不调用上述回调
          */
-        iWeiboShareAPI.handleWeiboResponse(intent, this);
+        iWeiBoShareAPI.handleWeiboResponse(intent, this);
     }
 
     /**
@@ -423,7 +499,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      * @return true 已安装微博客户端 false 未安装微博客户端
      */
     private boolean checkWBInstalled() {
-        return iWeiboShareAPI.isWeiboAppInstalled();
+        return iWeiBoShareAPI.isWeiboAppInstalled();
     }
 
     /**
@@ -431,17 +507,15 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      */
     private void weiBoAction() {
         try {
-            if (!Util.checkFastDoubleClick()) {
-                if (!checkWBInstalled()) {
-                    Toast.makeText(MainActivity.this, R.string.weibo_not_installed, Toast.LENGTH_SHORT).show();
-                } else {
-                    sendMessage(true, true, false, false, false, false);
-                    setVisible();
-                }
+            if (!checkWBInstalled()) {
+                Toast.makeText(MainActivity.this, R.string.weiBo_not_installed, Toast.LENGTH_SHORT).show();
+            } else {
+                sendMessage(true, true, false, false, false, false);
+                setVisible();
             }
         } catch (WeiboException e) {
             e.printStackTrace();
-            Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -457,14 +531,14 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         if (null != baseResp) {
             switch (baseResp.errCode) {
                 case WBConstants.ErrorCode.ERR_OK:
-                    Toast.makeText(this, R.string.share_success, Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, R.string.share_success, Toast.LENGTH_LONG).show();
                     break;
                 case WBConstants.ErrorCode.ERR_CANCEL:
-                    Toast.makeText(this, R.string.share_cancel, Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, R.string.share_cancel, Toast.LENGTH_LONG).show();
                     break;
                 case WBConstants.ErrorCode.ERR_FAIL:
                     String errMsg = R.string.share_fail + " Error message:" + baseResp.errMsg;
-                    Toast.makeText(this, errMsg, Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, errMsg, Toast.LENGTH_LONG).show();
                     break;
             }
         }
@@ -477,15 +551,15 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      */
     private void sendMessage(boolean hasText, boolean hasImage,
                              boolean hasWebPage, boolean hasMusic, boolean hasVideo, boolean hasVoice) {
-        if (iWeiboShareAPI.isWeiboAppSupportAPI()) {
-            int supportAPI = iWeiboShareAPI.getWeiboAppSupportAPI();
+        if (iWeiBoShareAPI.isWeiboAppSupportAPI()) {
+            int supportAPI = iWeiBoShareAPI.getWeiboAppSupportAPI();
             if (supportAPI >= 10351) {
                 sendMultiMessage(hasText, hasImage, hasWebPage, hasMusic, hasVideo, hasVoice);
             } else {
                 sendSingleMessage(hasText, hasImage, hasWebPage, hasMusic, hasVideo);
             }
         } else {
-            Toast.makeText(MainActivity.this, R.string.weibo_not_supported, Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, R.string.weiBo_not_supported, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -504,35 +578,35 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
     private void sendMultiMessage(boolean hasText, boolean hasImage, boolean hasWebPage,
                                   boolean hasMusic, boolean hasVideo, boolean hasVoice) {
         // 1. 初始化微博的分享消息
-        WeiboMultiMessage weiboMessage = new WeiboMultiMessage();
+        WeiboMultiMessage weiBoMessage = new WeiboMultiMessage();
         if (hasText) {
-            weiboMessage.textObject = getTextObj();
+            weiBoMessage.textObject = getTextObj();
         }
         if (hasImage) {
-            weiboMessage.imageObject = getImageObj();
+            weiBoMessage.imageObject = getImageObj();
         }
         // 用户可以分享其它媒体资源（网页、音乐、视频、声音中的一种）
         if (hasWebPage) {
-            weiboMessage.mediaObject = new WebpageObject();
+            weiBoMessage.mediaObject = new WebpageObject();
         }
         if (hasMusic) {
-            weiboMessage.mediaObject = new MusicObject();
+            weiBoMessage.mediaObject = new MusicObject();
         }
         if (hasVideo) {
-            weiboMessage.mediaObject = new VideoObject();
+            weiBoMessage.mediaObject = new VideoObject();
         }
         if (hasVoice) {
-            weiboMessage.mediaObject = new VoiceObject();
+            weiBoMessage.mediaObject = new VoiceObject();
         }
 
         // 2. 初始化从第三方到微博的消息请求
         SendMultiMessageToWeiboRequest request = new SendMultiMessageToWeiboRequest();
         // 用transaction唯一标识一个请求
         request.transaction = String.valueOf(System.currentTimeMillis());
-        request.multiMessage = weiboMessage;
+        request.multiMessage = weiBoMessage;
 
         // 3. 发送请求消息到微博，唤起微博分享界面
-        iWeiboShareAPI.sendRequest(MainActivity.this, request);
+        iWeiBoShareAPI.sendRequest(MainActivity.this, request);
     }
 
     /**
@@ -574,7 +648,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         request.message = weiboMessage;
 
         // 3. 发送请求消息到微博，唤起微博分享界面
-        iWeiboShareAPI.sendRequest(MainActivity.this, request);
+        iWeiBoShareAPI.sendRequest(MainActivity.this, request);
     }
 
     /**
