@@ -20,12 +20,12 @@
     <string name="version_error">安卓版本过低无法运行</string>
     <string name="text_too_long">你输入的字数已经到达限制</string>
     <string name="text_length_hint">还能输入10个字</string>
-    <string name="text_is_null">文本已清空</string>
     <string name="wish_text_selection">请选择祝福语</string>
     <string name="confirm">确定</string>
     <string name="cancel">取消</string>
     <string name="select_picture">请选择拜年图片</string>
-    <string name="long_press_hint1">长按图片可查看大图</string>
-    <string name="long_press_hint2">长按以清空文本</string>
+    <string name="long_press_hint">长按图片可查看大图</string>
+    <string name="text_enter_hint">摇晃设备以清空文本，长按以重新选择默认祝福语</string>
+    <string name="text_enter_not_available">输入祝福语不可用</string>
 
 </resources>
