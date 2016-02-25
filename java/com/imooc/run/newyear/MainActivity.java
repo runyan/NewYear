@@ -8,6 +8,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -74,7 +78,14 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
     private AlertDialog.Builder mAlertBuilder;
     private AlertDialog.Builder mSelectBuilder;
 
+    private Sensor mSensor;
+    private SensorManager mSensorManager;
+
+    private boolean hasShaken = false; //判断是否已经摇晃的标志位
+
     private String mFilePath; //相机拍照后图片的保存位置
+
+    private boolean hasClicked = false; //判断是否已被点击
 
     private final int maxTextLength = 10;
 
@@ -84,6 +95,9 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         setContentView(R.layout.activity_main);
 
         mContext = MainActivity.this;
+
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         mAlertBuilder = new AlertDialog.Builder(mContext);
         mSelectBuilder = new AlertDialog.Builder(mContext);
@@ -120,6 +134,24 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         Util.exit(this);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //注册监听事件
+        if (mSensorManager != null) {
+            mSensorManager.registerListener(mShakeWatcher, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //取消监听
+        if (mSensorManager != null) {
+            mSensorManager.unregisterListener(mShakeWatcher);
+        }
+    }
+
     /**
      *  通用部分
      */
@@ -134,39 +166,14 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWishText.setOnClickListener(new View.OnClickListener() { //输入框的点击事件
             @Override
             public void onClick(View v) {
-                Toast.makeText(mContext, getResources().getString(R.string.long_press_hint2), Toast.LENGTH_SHORT)
-                        .show();
+                if (!hasClicked) {
+                    Toast.makeText(mContext, getString(R.string.text_enter_hint), Toast.LENGTH_SHORT)
+                            .show();
+                    hasClicked = true;
+                }
+                hasShaken = false;
                 if (0 == Util.getTextLength(mWishText)) { //当输入框中没有文本时，弹出选择框
-                    //默认祝福语
-                    final String[] wishTexts = getResources().getStringArray(R.array.WishTextItemArray);
-                    mAlertBuilder.setItems(getResources().getStringArray(R.array.WishTextItemSelectionArray), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch (which) {
-                                case 0: {  //选择默认祝福语
-                                    //默认祝福语选择对话框
-                                    mSelectBuilder.setTitle(getResources().getString(R.string.wish_text_selection))
-                                            .setSingleChoiceItems(wishTexts, 0, new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    mWishText.setText(wishTexts[which]); //设置默认祝福语到输入框
-                                                    dialog.dismiss(); //关闭对话框
-                                                    Util.closeInputMethod(mContext, mWishText); //选择祝福语后关闭屏幕键盘
-                                                }
-                                            });
-                                    mSelectBuilder.show();
-                                    break;
-                                }
-                                case 1: { //选择输入祝福语
-                                    //输入框获得焦点
-                                    mWishText.setFocusable(true);
-                                    mWishText.requestFocus();
-                                    break;
-                                }
-                            }
-                        }
-                    });
-                    mAlertBuilder.show();
+                    enterText(true);
                 }
             }
         });
@@ -174,11 +181,8 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWishText.setOnLongClickListener(new View.OnLongClickListener() { //长按输入框清空文本
             @Override
             public boolean onLongClick(View v) {
-                if (0 != Util.getTextLength(mWishText)) { //如果输入框内有内容则清空
-                    mWishText.setText("");
-                    Util.vibrate(MainActivity.this, 1);
-                } else { //如果输入框内没有内容弹出提示信息
-                    Toast.makeText(mContext, getResources().getString(R.string.text_is_null), Toast.LENGTH_SHORT).show();
+                if (0 != Util.getTextLength(mWishText)) { //如果输入框内有内容则可以重新选择祝福语
+                    enterText(false);
                 }
                 return true;
             }
@@ -243,6 +247,75 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
             }
         });
     }
+
+    /**
+     * 弹出选择祝福语对话框
+     *
+     * @param flag 是否可以输入祝福语
+     */
+    private void enterText(final boolean flag) {
+        final String[] wishTexts = getResources().getStringArray(R.array.WishTextItemArray); //默认祝福语
+        mAlertBuilder.setItems(getResources().getStringArray(R.array.WishTextItemSelectionArray),
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0: {  //选择默认祝福语
+                                //默认祝福语选择对话框
+                                mSelectBuilder.setTitle(getString(R.string.wish_text_selection))
+                                        .setSingleChoiceItems(wishTexts, 0, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                mWishText.setText(wishTexts[which]); //设置默认祝福语到输入框
+                                                dialog.dismiss(); //关闭对话框
+                                                Util.closeInputMethod(mContext, mWishText); //选择祝福语后关闭屏幕键盘
+                                            }
+                                        });
+                                mSelectBuilder.show();
+                                break;
+                            }
+                            case 1: { //选择输入祝福语
+                                if (flag) {
+                                    //输入框获得焦点
+                                    mWishText.setFocusable(true);
+                                    mWishText.requestFocus();
+                                } else {
+                                    //输入祝福语不可用
+                                    Toast.makeText(mContext, getString(R.string.text_enter_not_available), Toast.LENGTH_SHORT).show();
+                                }
+                                break;
+                            }
+                        }
+                    }
+                });
+        mAlertBuilder.show();
+    }
+
+    //摇晃设备监听类
+    private final SensorEventListener mShakeWatcher = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            float values[] = event.values;
+            float x = values[0]; // x轴方向的重力加速度
+            float y = values[1]; // y轴方向的重力加速度
+            float z = values[2]; // z轴方向的重力加速度
+
+            int threshold = 18; //这里设置的一个阈值为18，经测试比较满足一般的摇晃，也可以自己按需定义修改
+            if ((Math.abs(x) > threshold || Math.abs(y) > threshold || Math
+                    .abs(z) > threshold) && !hasShaken) {
+                if (!mWishText.getText().toString().equals("") && !hasShaken) {
+                    mWishText.setText("");
+                    Util.vibrate(MainActivity.this, 1);
+                    hasShaken = true;
+                }
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+    };
 
     //文本事件监听类
     private final TextWatcher mTextWatcher = new TextWatcher() {
