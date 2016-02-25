@@ -71,6 +71,7 @@ public class Util {
      * 实现手机震动
      *
      * @param activity 实现手机震动的activity
+     * @param mode 震动模式
      */
     public static void vibrate(Activity activity, int mode) {
         //通过系统服务获得手机震动服务
