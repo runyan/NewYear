@@ -1,12 +1,14 @@
 <resources>
     <string name="app_name">新年好</string>
     <string name="wish">写下你的新年愿望</string>
-    <string name="weibo_not_supported">不支持的微博客户端</string>
-    <string name="weichat_not_installed">未安装微信，分享失败</string>
-    <string name="weibo_not_installed">未安装微博，分享失败</string>
+    <string name="weiBo_not_supported">不支持的微博客户端</string>
+    <string name="weiChat_not_installed">未安装微信，分享失败</string>
+    <string name="weiBo_not_installed">未安装微博，分享失败</string>
     <string name="share_success">分享成功</string>
     <string name="share_cancel">分享取消</string>
     <string name="share_fail">分享失败</string>
+    <string name="share_deny">分享被拒绝</string>
+    <string name="share_return">分享返回</string>
     <string name="wish_text">新年好</string>
     <string name="save_photo">是否将图片保存到系统图库</string>
     <string name="yes">是</string>
@@ -18,4 +20,12 @@
     <string name="version_error">安卓版本过低无法运行</string>
     <string name="text_too_long">你输入的字数已经到达限制</string>
     <string name="text_length_hint">还能输入10个字</string>
+    <string name="text_is_null">文本已清空</string>
+    <string name="wish_text_selection">请选择祝福语</string>
+    <string name="confirm">确定</string>
+    <string name="cancel">取消</string>
+    <string name="select_picture">请选择拜年图片</string>
+    <string name="long_press_hint1">长按图片可查看大图</string>
+    <string name="long_press_hint2">长按以清空文本</string>
+
 </resources>
