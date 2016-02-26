@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -35,8 +36,8 @@
             android:windowSoftInputMode="adjustResize"
             android:exported="false" >
         </activity>
-        <activity android:name=".PicSelectActivity">
-
+        <activity android:name=".PicSelectActivity"
+            android:screenOrientation="portrait">
         </activity>
     </application>
 
