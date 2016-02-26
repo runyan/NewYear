@@ -108,7 +108,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         }
 
         initViews(); //初始化显示控件;
-        Util.verifyStoragePermissions(this); //确认应用拥有读写存储权限
+        Util.verifyStoragePermissions(this); //查询应用是否拥有读写存储权限，没有则询问用户是否授权
 
         //初始化保存位置
         mFilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
@@ -207,13 +207,17 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                                 break;
                             }
                             case 1: {//选择相机
-                                if (Util.checkStoragePermission(MainActivity.this)) {
-                                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                    Uri photoUri = Uri.fromFile(new File(mFilePath));
-                                    intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
-                                    startActivityForResult(intent, Constants.REQ_CAMERA); //拍照并保存照片
+                                if(Util.hasCamera(mContext)) {
+                                    if (Util.checkStoragePermission(MainActivity.this)) {
+                                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                        Uri photoUri = Uri.fromFile(new File(mFilePath));
+                                        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+                                        startActivityForResult(intent, Constants.REQ_CAMERA); //拍照并保存照片
+                                    } else {
+                                        Toast.makeText(mContext, getString(R.string.need_permission), Toast.LENGTH_SHORT).show();
+                                    }
                                 } else {
-                                    Toast.makeText(mContext, "no permission", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(mContext, getString(R.string.camera_not_available), Toast.LENGTH_SHORT).show();
                                 }
                                 break;
                             }

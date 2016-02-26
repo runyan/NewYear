@@ -84,10 +84,10 @@ public class Util {
             // pattern的形式为new long[]{arg1,arg2,arg3,arg4......},
             // 其中以两个一组的如arg1和arg2为一组、arg3和arg4为一组，
             // 每一组的前一个代表等待多少毫秒启动vibrator，后一个代表vibrator持续多少毫秒停止之后往复即可。
-            // Repeat表示重复次数，当其为-1时，表示不重复只以pattern的方 式运行一次）。
+            // Repeat表示重复次数，当其为-1时，表示不重复只以pattern的方式运行一次）。
             //long[] pattern = {100, 400, 100, 400};
             //int repeat = -1;
-            // vibrator.vibrate(pattern, repeat);
+            //vibrator.vibrate(pattern, repeat);
             //vibrator.cancel(); //停止
         }
     }
@@ -106,10 +106,7 @@ public class Util {
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
             };
 
-            // 检查是否拥有写权限
-            int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-            if (permission != PackageManager.PERMISSION_GRANTED) {
+            if (!checkStoragePermission(activity)) {
                 // 如果没有权限则向用户申请
                 ActivityCompat.requestPermissions(
                         activity,
@@ -127,8 +124,20 @@ public class Util {
      * @return true 有读写权限，false 有读写权限
      */
     public static boolean checkStoragePermission(Activity activity) {
+        // 检查是否拥有写权限
         int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         return permission == PackageManager.PERMISSION_GRANTED;
+    }
+
+    /**
+     * 检查设备是否有相机
+     *
+     * @param context 要检查的上下文
+     * @return true 设备有相机，false 设备没有相机
+     */
+    public static boolean hasCamera(Context context) {
+        PackageManager pm = context.getPackageManager();
+        return pm.hasSystemFeature(PackageManager.FEATURE_CAMERA);
     }
 
 }
