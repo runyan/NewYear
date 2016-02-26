@@ -39,7 +39,7 @@ public class PicSelectActivity extends Activity {
 
         initView();
 
-        Toast.makeText(PicSelectActivity.this, getString(R.string.long_press_hint), Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext, getString(R.string.long_press_hint), Toast.LENGTH_SHORT).show();
     }
 
     private void initView() {
@@ -128,7 +128,7 @@ public class PicSelectActivity extends Activity {
             mPopupWindow.update(0, 0, mPopupWindow.getWidth(), mPopupWindow.getHeight());
             mPopupWindow.showAsDropDown(v);
 
-            Util.vibrate(PicSelectActivity.this, 2);
+            Util.vibrate(PicSelectActivity.this);
 
             return true;
         }

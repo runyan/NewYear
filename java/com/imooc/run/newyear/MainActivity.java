@@ -103,14 +103,15 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mSelectBuilder = new AlertDialog.Builder(mContext);
 
         if (!Util.versionCheck()) {
-            Toast.makeText(MainActivity.this, R.string.version_error, Toast.LENGTH_LONG).show();
+            Toast.makeText(mContext, getString(R.string.version_error), Toast.LENGTH_LONG).show();
             Util.exit(this);
         }
 
         initViews(); //初始化显示控件;
+        Util.verifyStoragePermissions(this); //确认应用拥有读写存储权限
 
         //初始化保存位置
-        mFilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString()
+        mFilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
                 + "/Camera" + "/" + "img.png";
 
         //注册app到微博，微信
@@ -206,10 +207,14 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                                 break;
                             }
                             case 1: {//选择相机
-                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                Uri photoUri = Uri.fromFile(new File(mFilePath));
-                                intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
-                                startActivityForResult(intent, Constants.REQ_CAMERA); //拍照并保存照片
+                                if (Util.checkStoragePermission(MainActivity.this)) {
+                                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                    Uri photoUri = Uri.fromFile(new File(mFilePath));
+                                    intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+                                    startActivityForResult(intent, Constants.REQ_CAMERA); //拍照并保存照片
+                                } else {
+                                    Toast.makeText(mContext, "no permission", Toast.LENGTH_SHORT).show();
+                                }
                                 break;
                             }
                             case 2: {//选择默认图片
@@ -303,9 +308,9 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
             int threshold = 18; //这里设置的一个阈值为18，经测试比较满足一般的摇晃，也可以自己按需定义修改
             if ((Math.abs(x) > threshold || Math.abs(y) > threshold || Math
                     .abs(z) > threshold) && !hasShaken) {
-                if (!mWishText.getText().toString().equals("") && !hasShaken) {
+                if (0 != Util.getTextLength(mWishText) && !hasShaken) {
                     mWishText.setText("");
-                    Util.vibrate(MainActivity.this, 1);
+                    Util.vibrate(MainActivity.this);
                     hasShaken = true;
                 }
             }
@@ -341,7 +346,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
             String str = "还能输入" + remainTextLength + "个字";
             mTextLength.setText(str);
             if (temp.length() >= 10) {
-                Toast.makeText(mContext, R.string.text_too_long, Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, getString(R.string.text_too_long), Toast.LENGTH_SHORT).show();
             }
         }
     };
@@ -419,7 +424,8 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                     fis = new FileInputStream(mFilePath); //获取照片的输入流
                     Bitmap bitmap = BitmapFactory.decodeStream(fis); //从照片的输入流中将图片解码为Bitmap
                     mPhoto.setImageBitmap(bitmap); //设置显示图片
-                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);//询问是否将图片保存在图库的对话框
+                    //询问是否将图片保存在图库
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                     builder.setMessage(R.string.save_photo);
                     builder.setPositiveButton(R.string.yes, null);
                     builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() { //如果不保存
@@ -427,12 +433,13 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                         public void onClick(DialogInterface dialog, int which) {
                             File f = new File(mFilePath);
                             if (!f.delete()) { //将图片从图库中删除
-                                Toast.makeText(mContext, R.string.delete_fail, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mContext, getString(R.string.delete_fail), Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
                     builder.show();
                 } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "error", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 } finally {
                     try {
@@ -520,7 +527,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      */
     private void weChatAction(int flag) {
         if (!checkWXInstalled()) {
-            Toast.makeText(mContext, R.string.weiChat_not_installed, Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, getString(R.string.weiChat_not_installed), Toast.LENGTH_SHORT).show();
         } else {
             weChatShare(flag);
             setVisible();
@@ -581,7 +588,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
     private void weiBoAction() {
         try {
             if (!checkWBInstalled()) {
-                Toast.makeText(MainActivity.this, R.string.weiBo_not_installed, Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, getString(R.string.weiBo_not_installed), Toast.LENGTH_SHORT).show();
             } else {
                 sendMessage(true, true, false, false, false, false);
                 setVisible();
@@ -604,13 +611,13 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         if (null != baseResp) {
             switch (baseResp.errCode) {
                 case WBConstants.ErrorCode.ERR_OK:
-                    Toast.makeText(mContext, R.string.share_success, Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, getString(R.string.share_success), Toast.LENGTH_LONG).show();
                     break;
                 case WBConstants.ErrorCode.ERR_CANCEL:
-                    Toast.makeText(mContext, R.string.share_cancel, Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, getString(R.string.share_cancel), Toast.LENGTH_LONG).show();
                     break;
                 case WBConstants.ErrorCode.ERR_FAIL:
-                    String errMsg = R.string.share_fail + " Error message:" + baseResp.errMsg;
+                    String errMsg = getString(R.string.share_fail) + " Error message:" + baseResp.errMsg;
                     Toast.makeText(mContext, errMsg, Toast.LENGTH_LONG).show();
                     break;
             }
@@ -632,7 +639,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                 sendSingleMessage(hasText, hasImage, hasWebPage, hasMusic, hasVideo);
             }
         } else {
-            Toast.makeText(mContext, R.string.weiBo_not_supported, Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, getString(R.string.weiBo_not_supported), Toast.LENGTH_SHORT).show();
         }
     }
 
