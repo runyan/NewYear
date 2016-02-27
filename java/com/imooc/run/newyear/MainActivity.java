@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
@@ -82,13 +81,14 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
     private Sensor mSensor;
     private SensorManager mSensorManager;
 
-    private boolean hasShaken = false; //判断是否已经摇晃的标志位
+    private final String mFilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+            + "/Camera" + "/" + "img.png"; //相机拍照后图片的保存位置
 
-    private String mFilePath; //相机拍照后图片的保存位置
+    private final int maxTextLength = 10; //可以输入的最大文本长度
 
     private boolean hasClicked = false; //判断是否已被点击
 
-    private final int maxTextLength = 10;
+    private boolean hasShaken = false; //判断是否已经摇晃的标志位
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,10 +111,6 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         initViews(); //初始化显示控件;
         Util.verifyStoragePermissions(MainActivity.this); //查询应用是否拥有读写存储权限，没有则询问用户是否授权
 
-        //初始化保存位置
-        mFilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
-                + "/Camera" + "/" + "img.png";
-
         //注册app到微博，微信
         regToWX();
         regToWB();
@@ -128,11 +124,6 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         if (null != savedInstanceState) {
             iWeiBoShareAPI.handleWeiboResponse(getIntent(), this);
         }
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration config) {
-        super.onConfigurationChanged(config);
     }
 
     @Override
@@ -230,6 +221,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                             case 2: {//选择默认图片
                                 Intent intent = new Intent(MainActivity.this, PicSelectActivity.class);
                                 startActivityForResult(intent, Constants.REQ_DEFAULT);
+                                break;
                             }
                         }
                     }
@@ -446,8 +438,8 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                     builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() { //如果不保存
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            File f = new File(mFilePath);
-                            if (!f.delete()) { //将图片从图库中删除
+                            File photo = new File(mFilePath);
+                            if (!photo.delete()) { //将图片从图库中删除
                                 Toast.makeText(mContext, getString(R.string.delete_fail), Toast.LENGTH_SHORT).show();
                             }
                         }
