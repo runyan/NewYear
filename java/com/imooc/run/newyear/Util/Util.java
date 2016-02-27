@@ -2,6 +2,7 @@ package com.imooc.run.newyear.Util;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
@@ -11,6 +12,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
+
+import com.imooc.run.newyear.R;
 
 import org.jetbrains.annotations.Contract;
 
@@ -138,6 +141,17 @@ public class Util {
     public static boolean hasCamera(Context context) {
         PackageManager pm = context.getPackageManager();
         return pm.hasSystemFeature(PackageManager.FEATURE_CAMERA);
+    }
+
+    /**
+     * 根据系统版本改变AlertDialog样式
+     *
+     * @param context 上下文
+     * @return 不同的AlertDialog样式
+     */
+    public static AlertDialog.Builder getAlertDialog(Context context) {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ?
+                new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle) : new AlertDialog.Builder(context);
     }
 
 }

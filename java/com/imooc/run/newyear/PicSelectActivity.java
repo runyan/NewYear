@@ -25,17 +25,14 @@ public class PicSelectActivity extends Activity {
 
     private PopupWindow mPopupWindow;
 
-    private int picId;
+    private int picId = R.drawable.pic1;
 
-    private Context mContext;
+    private final Context mContext = PicSelectActivity.this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pic_select);
-
-        mContext = PicSelectActivity.this;
-        picId = R.drawable.pic1;
 
         initView();
 
@@ -96,7 +93,7 @@ public class PicSelectActivity extends Activity {
         for (int i = 0; i < radioButtonCount; i++) {
             View view = radioGroup.getChildAt(i);
             if (view instanceof RadioButton) {
-                view.setOnLongClickListener(new LongClick());
+                view.setOnLongClickListener(new mLongClickWatcher());
             }
         }
     }
@@ -112,7 +109,7 @@ public class PicSelectActivity extends Activity {
         return R.drawable.largep1 + radioButtonID - R.id.pic1;
     }
 
-    private class LongClick implements View.OnLongClickListener {
+    private class mLongClickWatcher implements View.OnLongClickListener {
 
         @Override
         public boolean onLongClick(View v) {
@@ -123,7 +120,7 @@ public class PicSelectActivity extends Activity {
             ((ImageView) mPopupWindow.getContentView().findViewById(R.id.large_pic))
                     .setImageDrawable(Util.getDrawable(mContext, largePicId));
 
-            mPopupWindow.setAnimationStyle(R.style.anim_menu_bottombar);//设置popupWindow的弹出动画
+            mPopupWindow.setAnimationStyle(R.style.anim_menu_bottomBar);//设置popupWindow的弹出动画
             mPopupWindow.showAtLocation(v.getRootView(), Gravity.CENTER, 0, 0); //设置popupWindow的弹出位置
             mPopupWindow.update(0, 0, mPopupWindow.getWidth(), mPopupWindow.getHeight());
             mPopupWindow.showAsDropDown(v);

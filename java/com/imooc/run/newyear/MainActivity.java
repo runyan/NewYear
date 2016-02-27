@@ -100,8 +100,8 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-        mAlertBuilder = new AlertDialog.Builder(mContext);
-        mSelectBuilder = new AlertDialog.Builder(mContext);
+        mAlertBuilder = Util.getAlertDialog(mContext);
+        mSelectBuilder = Util.getAlertDialog(mContext);
 
         if (!Util.versionCheck()) {
             Toast.makeText(mContext, getString(R.string.version_error), Toast.LENGTH_LONG).show();
@@ -427,7 +427,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                     Bitmap bitmap = BitmapFactory.decodeStream(fis); //从照片的输入流中将图片解码为Bitmap
                     mPhoto.setImageBitmap(bitmap); //设置显示图片
                     //询问是否将图片保存在图库
-                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                    AlertDialog.Builder builder = Util.getAlertDialog(mContext);
                     builder.setMessage(R.string.save_photo);
                     builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                         @Override
