@@ -29,5 +29,7 @@
     <string name="text_enter_not_available">输入祝福语不可用</string>
     <string name="need_permission">需要读写存储权限，请在设置中为应用添加读写存储后重试</string>
     <string name="camera_not_available">设备没有相机或者相机不可用</string>
+    <string name="error">出现错误</string>
+    <string name="save_hint">如果没有在图库中找到照片，请在DICM/Camera文件夹下寻找</string>
 
 </resources>

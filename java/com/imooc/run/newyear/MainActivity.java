@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
@@ -104,11 +105,11 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
 
         if (!Util.versionCheck()) {
             Toast.makeText(mContext, getString(R.string.version_error), Toast.LENGTH_LONG).show();
-            Util.exit(this);
+            Util.exit(MainActivity.this);
         }
 
         initViews(); //初始化显示控件;
-        Util.verifyStoragePermissions(this); //查询应用是否拥有读写存储权限，没有则询问用户是否授权
+        Util.verifyStoragePermissions(MainActivity.this); //查询应用是否拥有读写存储权限，没有则询问用户是否授权
 
         //初始化保存位置
         mFilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
@@ -124,22 +125,27 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
          * 执行成功，返回 true，并调用 {@link IWeiboHandler.Response#onResponse}；
          * 失败返回 false，不调用上述回调
          */
-        if (savedInstanceState != null) {
+        if (null != savedInstanceState) {
             iWeiBoShareAPI.handleWeiboResponse(getIntent(), this);
         }
     }
 
     @Override
+    public void onConfigurationChanged(Configuration config) {
+        super.onConfigurationChanged(config);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
-        Util.exit(this);
+        Util.exit(MainActivity.this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         //注册监听事件
-        if (mSensorManager != null) {
+        if (null != mSensorManager) {
             mSensorManager.registerListener(mShakeWatcher, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
     }
@@ -148,7 +154,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
     protected void onPause() {
         super.onPause();
         //取消监听
-        if (mSensorManager != null) {
+        if (null != mSensorManager) {
             mSensorManager.unregisterListener(mShakeWatcher);
         }
     }
@@ -190,7 +196,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         });
 
         mTextLength = (TextView) findViewById(R.id.text_length);
-        mTextLength.setText(R.string.text_length_hint);
+        mTextLength.setText(getString(R.string.text_length_hint));
 
         mPhoto = (ImageView) findViewById(R.id.photo);
         mPhoto.setOnClickListener(new View.OnClickListener() {
@@ -207,7 +213,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                                 break;
                             }
                             case 1: {//选择相机
-                                if(Util.hasCamera(mContext)) {
+                                if (Util.hasCamera(mContext)) {
                                     if (Util.checkStoragePermission(MainActivity.this)) {
                                         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                                         Uri photoUri = Uri.fromFile(new File(mFilePath));
@@ -431,7 +437,12 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                     //询问是否将图片保存在图库
                     AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                     builder.setMessage(R.string.save_photo);
-                    builder.setPositiveButton(R.string.yes, null);
+                    builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(mContext, getString(R.string.save_hint), Toast.LENGTH_SHORT).show();
+                        }
+                    });
                     builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() { //如果不保存
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -443,7 +454,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                     });
                     builder.show();
                 } catch (Exception e) {
-                    Toast.makeText(MainActivity.this, "error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, getString(R.string.error) + ":" + e.getMessage(), Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 } finally {
                     try {
@@ -451,6 +462,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                             fis.close();
                         }
                     } catch (Exception e) {
+                        Toast.makeText(mContext, getString(R.string.error) + ":" + e.getMessage(), Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
                     }
                 }
@@ -599,7 +611,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
             }
         } catch (WeiboException e) {
             e.printStackTrace();
-            Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, getString(R.string.error) + ":" + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -621,7 +633,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                     Toast.makeText(mContext, getString(R.string.share_cancel), Toast.LENGTH_LONG).show();
                     break;
                 case WBConstants.ErrorCode.ERR_FAIL:
-                    String errMsg = getString(R.string.share_fail) + " Error message:" + baseResp.errMsg;
+                    String errMsg = getString(R.string.share_fail) + " " + getString(R.string.error) + ":" + baseResp.errMsg;
                     Toast.makeText(mContext, errMsg, Toast.LENGTH_LONG).show();
                     break;
             }
