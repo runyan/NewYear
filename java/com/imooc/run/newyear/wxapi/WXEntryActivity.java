@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.imooc.run.newyear.R;
+import com.imooc.run.newyear.Util.Util;
 import com.imooc.run.newyear.constants.WeChatConstants;
 import com.tencent.mm.sdk.modelbase.BaseReq;
 import com.tencent.mm.sdk.modelbase.BaseResp;
@@ -53,7 +54,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
                 result = getString(R.string.share_return);
                 break;
         }
-        Toast.makeText(mContext, result, Toast.LENGTH_LONG).show();
+        Util.showMessage(mContext, result, Toast.LENGTH_LONG);
         this.finish();
     }
 }

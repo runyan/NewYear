@@ -12,10 +12,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.imooc.run.newyear.R;
 
 import org.jetbrains.annotations.Contract;
+
+import java.io.File;
 
 public class Util {
 
@@ -154,4 +157,38 @@ public class Util {
                 new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle) : new AlertDialog.Builder(context);
     }
 
+    /**
+     * 删除照片
+     *
+     * @param path 要删除的照片路径
+     * @return true 删除成功， false 删除失败
+     */
+    public static boolean deletePhoto(String path) {
+        File photo = new File(path);
+        return photo.delete();
+    }
+
+    /**
+     * 显示异常信息
+     *
+     * @param throwable 程序抛出的异常
+     * @param context   上下文
+     */
+    public static void showErrorMsg(Throwable throwable, Context context) {
+        String errMsg = context.getString(R.string.error) + ":" + throwable.getMessage();
+        showMessage(context, errMsg, Toast.LENGTH_SHORT);
+        throwable.printStackTrace();
+    }
+
+
+    /**
+     * 显示提示信息
+     *
+     * @param context 上下文
+     * @param message 要显示的信息
+     * @param length  显示时长
+     */
+    public static void showMessage(Context context, String message, int length) {
+        Toast.makeText(context, message, length).show();
+    }
 }
