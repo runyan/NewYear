@@ -24,6 +24,8 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
         mContext = WXEntryActivity.this;
         api = WXAPIFactory.createWXAPI(mContext, WeChatConstants.APP_ID, false);
         api.handleIntent(getIntent(), this);
+        overridePendingTransition(R.anim.zoom_in, R.anim.zoom_out);
+        Util.smoothSwitchScreen(mContext, WXEntryActivity.this);
         super.onCreate(savedInstanceState);
     }
 

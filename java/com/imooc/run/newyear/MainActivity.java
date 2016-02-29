@@ -93,6 +93,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        overridePendingTransition(R.anim.zoom_in, R.anim.zoom_out); //设置切换动画
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -125,6 +126,15 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         if (null != savedInstanceState) {
             iWeiBoShareAPI.handleWeiboResponse(getIntent(), this);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+		//当APP没有被kill时只显示1次启动界面
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        startActivity(intent);
     }
 
     @Override
@@ -610,7 +620,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                 sendSingleMessage(hasText, hasImage, hasWebPage, hasMusic, hasVideo);
             }
         } else {
-           Util.showMessage(mContext, getString(R.string.weiBo_not_supported), Toast.LENGTH_SHORT);
+            Util.showMessage(mContext, getString(R.string.weiBo_not_supported), Toast.LENGTH_SHORT);
         }
     }
 

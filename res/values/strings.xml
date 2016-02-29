@@ -20,6 +20,7 @@
     <string name="version_error">安卓版本过低无法运行</string>
     <string name="text_too_long">你输入的字数已经到达限制</string>
     <string name="text_length_hint">还能输入10个字</string>
+    <string name="text_on_start_up">我是萌萌哒的启动界面</string>
     <string name="wish_text_selection">请选择祝福语</string>
     <string name="confirm">确定</string>
     <string name="cancel">取消</string>

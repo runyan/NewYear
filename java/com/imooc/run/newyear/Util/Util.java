@@ -10,6 +10,8 @@ import android.os.Build;
 import android.os.Vibrator;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,12 +60,11 @@ public class Util {
     }
 
     /**
-     * 彻底退出
+     * 退出APP
      */
     public static void exit(Activity activity) {
         activity.finish();
         System.exit(0);
-//        android.os.Process.killProcess(android.os.Process.myPid());
     }
 
     /**
@@ -191,4 +192,23 @@ public class Util {
     public static void showMessage(Context context, String message, int length) {
         Toast.makeText(context, message, length).show();
     }
+
+    /**
+     * 解决全屏与非全屏activity切换时界面不流畅问题
+     *
+     * @param context  上下文
+     * @param activity activity
+     */
+    public static void smoothSwitchScreen(Context context, Activity activity) {
+        // 5.0以上修复了此bug
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            ViewGroup rootView = ((ViewGroup) activity.findViewById(android.R.id.content));
+            int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+            int statusBarHeight = context.getResources().getDimensionPixelSize(resourceId);
+            rootView.setPadding(0, statusBarHeight, 0, 0);
+            activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+            activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        }
+    }
+
 }
