@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 def computeVersion() {
-    return "1.2.2";
+    return "1.2.3";
 }
 
 android {
@@ -12,7 +12,7 @@ android {
         applicationId "com.imooc.run.newyear"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 21
+        versionCode 22
         versionName computeVersion()
     }
     buildTypes {
