@@ -4,11 +4,20 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <TextView
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/loading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:gravity="center_vertical"
+        android:src="@drawable/loading"/>
+
+    <TextView
+        android:id="@+id/loading_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/loading"
+        android:layout_marginTop="10dp"
         android:text="@string/text_on_start_up"
         android:textColor="@color/colorAccent"
         android:textSize="30sp" />

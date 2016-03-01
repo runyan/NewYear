@@ -24,6 +24,6 @@ public class SplashActivity extends Activity {
                 overridePendingTransition(R.anim.zoom_in, R.anim.zoom_out); //设置切换动画
                 finish();
             }
-        }, 1500);
+        }, 2000);
     }
 }

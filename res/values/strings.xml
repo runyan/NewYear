@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">新年好</string>
+    <string name="action_settings">设置</string>
     <string name="wish">写下你的新年愿望</string>
     <string name="weiBo_not_supported">不支持的微博客户端</string>
     <string name="weiChat_not_installed">未安装微信，分享失败</string>
@@ -20,7 +21,7 @@
     <string name="version_error">安卓版本过低无法运行</string>
     <string name="text_too_long">你输入的字数已经到达限制</string>
     <string name="text_length_hint">还能输入10个字</string>
-    <string name="text_on_start_up">我是萌萌哒的启动界面</string>
+    <string name="text_on_start_up">我是萌萌哒的启动画面</string>
     <string name="wish_text_selection">请选择祝福语</string>
     <string name="confirm">确定</string>
     <string name="cancel">取消</string>

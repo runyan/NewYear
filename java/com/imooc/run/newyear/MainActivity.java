@@ -93,8 +93,8 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        overridePendingTransition(R.anim.zoom_in, R.anim.zoom_out); //设置切换动画
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.zoom_in, R.anim.zoom_out); //设置切换动画
         setContentView(R.layout.activity_main);
 
         mContext = MainActivity.this;
@@ -130,7 +130,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
 
     @Override
     public void onBackPressed() {
-		//当APP没有被kill时只显示1次启动界面
+        //当APP没有被kill时只显示1次启动界面
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.addCategory(Intent.CATEGORY_HOME);
@@ -231,6 +231,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                             case 2: {//选择默认图片
                                 Intent intent = new Intent(MainActivity.this, PicSelectActivity.class);
                                 startActivityForResult(intent, Constants.REQ_DEFAULT);
+                                overridePendingTransition(R.anim.zoom_in, R.anim.zoom_out); //设置切换动画
                                 break;
                             }
                         }

@@ -32,11 +32,13 @@ public class PicSelectActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.zoom_in, R.anim.zoom_out); //设置切换动画
+        Util.smoothSwitchScreen(mContext, PicSelectActivity.this);
         setContentView(R.layout.activity_pic_select);
 
         initView();
 
-        Toast.makeText(mContext, getString(R.string.long_press_hint), Toast.LENGTH_SHORT).show();
+        Util.showMessage(mContext, getString(R.string.long_press_hint), Toast.LENGTH_SHORT);
     }
 
     private void initView() {
