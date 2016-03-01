@@ -323,7 +323,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                     .abs(z) > threshold) && !hasShaken) {
                 if (0 != Util.getTextLength(mWishText) && !hasShaken) {
                     mWishText.setText("");
-                    Util.vibrate(MainActivity.this, 1);
+                    Util.vibrate(MainActivity.this, Constants.VIBRATE_SINGLE);
                     hasShaken = true;
                 }
             }

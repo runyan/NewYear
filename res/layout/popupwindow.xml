@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@android:color/transparent">
+    android:background="@color/grey">
 
     <ImageView
         android:id="@+id/large_pic"
@@ -20,6 +20,7 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/large_pic"
         android:layout_marginTop="50dp"
+        android:theme="@android:style/Widget.DeviceDefault.Button.Borderless"
         android:text="@string/select"/>
 
 </RelativeLayout>

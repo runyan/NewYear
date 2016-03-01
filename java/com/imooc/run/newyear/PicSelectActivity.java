@@ -131,7 +131,7 @@ public class PicSelectActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     radioButton.setChecked(true);
-                    Util.vibrate(PicSelectActivity.this, 2);
+                    Util.vibrate(PicSelectActivity.this, Constants.VIBRATE_DOUBLE);
                     mPopupWindow.dismiss();
                 }
             });
@@ -144,7 +144,7 @@ public class PicSelectActivity extends Activity {
             mPopupWindow.update(0, 0, mPopupWindow.getWidth(), mPopupWindow.getHeight());
             mPopupWindow.showAsDropDown(v);
 
-            Util.vibrate(PicSelectActivity.this, 1);
+            Util.vibrate(PicSelectActivity.this, Constants.VIBRATE_SINGLE);
 
             return true;
         }

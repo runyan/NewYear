@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.imooc.run.newyear.R;
+import com.imooc.run.newyear.constants.Constants;
 
 import org.jetbrains.annotations.Contract;
 
@@ -89,11 +90,11 @@ public class Util {
         //得到震动服务后检测vibrator是否存在
         if (vibrator.hasVibrator()) {
             switch (mode) {
-                case 1: {
+                case Constants.VIBRATE_SINGLE: {
                     vibrator.vibrate(200); //开始启动vibrator持续milliseconds毫秒。
                     break;
                 }
-                case 2: {
+                case Constants.VIBRATE_DOUBLE: {
                     /**
                      * 以pattern方式重复repeat次启动vibrator。
                      * pattern的形式为new long[]{arg1,arg2,arg3,arg4......},
