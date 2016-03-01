@@ -82,7 +82,6 @@ public class PicSelectActivity extends Activity {
         });
 
         setOnLongClickListener(mPics);
-
     }
 
     /**
@@ -113,21 +112,39 @@ public class PicSelectActivity extends Activity {
 
     private class mLongClickWatcher implements View.OnLongClickListener {
 
+        private Button mSelect;
+        private ImageView mLargePic;
+
+        private void init() {
+            mSelect = (Button) mPopupWindow.getContentView().findViewById(R.id.select_picture_by_large_picture);
+            mLargePic = (ImageView) mPopupWindow.getContentView().findViewById(R.id.large_pic);
+        }
+
         @Override
         public boolean onLongClick(View v) {
 
-            int largePicId = getLargePictureID(v.getId()); //获得大图的id
+            init();
+            final RadioButton radioButton = (RadioButton) v;
+            int largePicId = getLargePictureID(radioButton.getId()); //获得大图的id
+
+            mSelect.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    radioButton.setChecked(true);
+                    Util.vibrate(PicSelectActivity.this, 2);
+                    mPopupWindow.dismiss();
+                }
+            });
 
             //将大图设置到popupWindow的ImageView上
-            ((ImageView) mPopupWindow.getContentView().findViewById(R.id.large_pic))
-                    .setImageDrawable(Util.getDrawable(mContext, largePicId));
+            mLargePic.setImageDrawable(Util.getDrawable(mContext, largePicId));
 
             mPopupWindow.setAnimationStyle(R.style.anim_menu_bottomBar);//设置popupWindow的弹出动画
             mPopupWindow.showAtLocation(v.getRootView(), Gravity.CENTER, 0, 0); //设置popupWindow的弹出位置
             mPopupWindow.update(0, 0, mPopupWindow.getWidth(), mPopupWindow.getHeight());
             mPopupWindow.showAsDropDown(v);
 
-            Util.vibrate(PicSelectActivity.this);
+            Util.vibrate(PicSelectActivity.this, 1);
 
             return true;
         }

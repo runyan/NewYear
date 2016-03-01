@@ -22,7 +22,7 @@ public class SplashActivity extends Activity {
                 Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                 startActivity(intent);
                 overridePendingTransition(R.anim.zoom_in, R.anim.zoom_out); //设置切换动画
-                finish();
+                SplashActivity.this.finish();
             }
         }, 2000);
     }

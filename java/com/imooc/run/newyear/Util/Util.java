@@ -81,21 +81,35 @@ public class Util {
      * 实现手机震动
      *
      * @param activity 实现手机震动的activity
+     * @param mode     震动模式
      */
-    public static void vibrate(Activity activity) {
+    public static void vibrate(Activity activity, int mode) {
         //通过系统服务获得手机震动服务
         Vibrator vibrator = (Vibrator) activity.getSystemService(Context.VIBRATOR_SERVICE);
-        if (vibrator.hasVibrator()) { //得到震动服务后检测vibrator是否存在
-            vibrator.vibrate(200); //开始启动vibrator持续milliseconds毫秒。
-            // 以pattern方式重复repeat次启动vibrator。（
-            // pattern的形式为new long[]{arg1,arg2,arg3,arg4......},
-            // 其中以两个一组的如arg1和arg2为一组、arg3和arg4为一组，
-            // 每一组的前一个代表等待多少毫秒启动vibrator，后一个代表vibrator持续多少毫秒停止之后往复即可。
-            // Repeat表示重复次数，当其为-1时，表示不重复只以pattern的方式运行一次）。
-            //long[] pattern = {100, 400, 100, 400};
-            //int repeat = -1;
-            //vibrator.vibrate(pattern, repeat);
-            //vibrator.cancel(); //停止
+        //得到震动服务后检测vibrator是否存在
+        if (vibrator.hasVibrator()) {
+            switch (mode) {
+                case 1: {
+                    vibrator.vibrate(200); //开始启动vibrator持续milliseconds毫秒。
+                    break;
+                }
+                case 2: {
+                    /**
+                     * 以pattern方式重复repeat次启动vibrator。
+                     * pattern的形式为new long[]{arg1,arg2,arg3,arg4......},
+                     * 其中以两个一组的如arg1和arg2为一组、arg3和arg4为一组，
+                     * 每一组的前一个代表等待多少毫秒启动vibrator，后一个代表vibrator持续多少毫秒停止之后往复即可。
+                     * Repeat表示重复次数，当其为-1时，表示不重复只以pattern的方式运行一次）。
+                     */
+                    long[] pattern = {100, 400, 100, 400};
+                    int repeat = -1;
+                    vibrator.vibrate(pattern, repeat);
+                    break;
+                }
+                default: {
+                    vibrator.cancel(); //停止
+                }
+            }
         }
     }
 
@@ -125,7 +139,7 @@ public class Util {
     }
 
     /**
-     * 确认应用是否拥有读写权限
+     * 确认读写权限是否以被授予应用
      *
      * @param activity 要检查的activity
      * @return true 有读写权限，false 有读写权限
