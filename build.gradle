@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 def computeVersion() {
-    return "1.2.3";
+    return "1.2.6";
 }
 
 android {
@@ -12,7 +12,7 @@ android {
         applicationId "com.imooc.run.newyear"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 22
+        versionCode 25
         versionName computeVersion()
     }
     buildTypes {
@@ -24,11 +24,12 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.2.0'
     compile 'com.android.support:design:23.2.0'
     compile files('libs/libammsdk.jar')
     compile files('libs/weiboSDKCore_3.1.4.jar')
     compile 'org.jetbrains:annotations:13.0'
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.4'
 }
