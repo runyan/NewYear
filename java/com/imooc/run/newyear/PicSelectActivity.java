@@ -71,11 +71,8 @@ public class PicSelectActivity extends Activity {
 
         mConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {//回传数据
-                Intent data = new Intent();
-                data.putExtra("picId", String.valueOf(picId));
-                setResult(Constants.DEFAULT_RESULT, data);
-                PicSelectActivity.this.finish();
+            public void onClick(View v) {
+                backToMain(picId); //回传数据
             }
         });
 
@@ -124,6 +121,18 @@ public class PicSelectActivity extends Activity {
         return R.drawable.largep1 + radioButtonID - R.id.pic1;
     }
 
+    /**
+     * 返回主页面
+     *
+     * @param picId 需要回传的图片ID
+     */
+    private void backToMain(int picId) {
+        Intent data = new Intent();
+        data.putExtra("picId", String.valueOf(picId));
+        setResult(Constants.DEFAULT_RESULT, data);
+        PicSelectActivity.this.finish();
+    }
+
     private class mLongClickWatcher implements View.OnLongClickListener {
 
         private Button mSelect;
@@ -144,9 +153,9 @@ public class PicSelectActivity extends Activity {
             mSelect.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    radioButton.setChecked(true);
+                    picId = getLargePictureID(radioButton.getId());
                     Util.vibrate(PicSelectActivity.this, Constants.VIBRATE_DOUBLE);
-                    mPopupWindow.dismiss();
+                    backToMain(picId);
                 }
             });
 
