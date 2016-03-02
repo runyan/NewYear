@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:background="@drawable/pic1"
-            android:checked="true"/>
+            android:checked="true" />
 
         <RadioButton
             android:id="@+id/pic2"
@@ -80,6 +80,7 @@
 
 
     <LinearLayout
+        android:id="@+id/buttons"
         style="?android:buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -105,5 +106,14 @@
             android:text="@string/cancel" />
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/random_select"
+        style="?android:buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/buttons"
+        android:layout_centerHorizontal="true"
+        android:text="@string/lucky" />
 
 </RelativeLayout>

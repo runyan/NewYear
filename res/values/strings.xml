@@ -26,6 +26,7 @@
     <string name="confirm">确定</string>
     <string name="cancel">取消</string>
     <string name="select">选择</string>
+    <string name="lucky">试试运气</string>
     <string name="select_picture">请选择拜年图片</string>
     <string name="long_press_hint">长按图片可查看大图</string>
     <string name="text_enter_hint">摇晃设备以清空文本，长按以重新选择默认祝福语</string>

@@ -21,6 +21,8 @@ import com.imooc.run.newyear.constants.Constants;
 
 import org.jetbrains.annotations.Contract;
 
+import java.util.Random;
+
 public class PicSelectActivity extends Activity {
 
     private PopupWindow mPopupWindow;
@@ -28,6 +30,8 @@ public class PicSelectActivity extends Activity {
     private int picId = R.drawable.pic1;
 
     private final Context mContext = PicSelectActivity.this;
+
+    private RadioGroup mPics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,10 +46,11 @@ public class PicSelectActivity extends Activity {
     }
 
     private void initView() {
-        RadioGroup mPics = (RadioGroup) findViewById(R.id.pics);
+        mPics = (RadioGroup) findViewById(R.id.pics);
 
         Button mConfirm = (Button) findViewById(R.id.confirm);
         Button mCancel = (Button) findViewById(R.id.cancel);
+        Button mRandomSelect = (Button) findViewById(R.id.random_select);
 
         View popupView = getLayoutInflater().inflate(R.layout.popupwindow, new RelativeLayout(mContext), false);
 
@@ -78,6 +83,15 @@ public class PicSelectActivity extends Activity {
             @Override
             public void onClick(View v) {
                 PicSelectActivity.this.finish();
+            }
+        });
+
+        mRandomSelect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int seed = mPics.getChildCount();
+                int random = new Random().nextInt(seed);
+                ((RadioButton) mPics.getChildAt(random)).setChecked(true);
             }
         });
 
