@@ -65,7 +65,6 @@ public class Util {
      */
     public static void exit(Activity activity) {
         activity.finish();
-        System.exit(0);
     }
 
     /**

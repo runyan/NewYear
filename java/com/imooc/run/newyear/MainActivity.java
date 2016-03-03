@@ -19,6 +19,7 @@ import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -126,6 +127,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         if (null != savedInstanceState) {
             iWeiBoShareAPI.handleWeiboResponse(getIntent(), this);
         }
+
     }
 
     @Override
@@ -200,7 +202,8 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mTextLength.setText(getString(R.string.text_length_hint));
 
         mPhoto = (ImageView) findViewById(R.id.photo);
-        mPhoto.setOnClickListener(new View.OnClickListener() {
+
+        mPhoto.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 mAlertBuilder.setItems(getResources().getStringArray(R.array.GalleryItemSelectionArray), new DialogInterface.OnClickListener() { //选择图片位置
@@ -242,7 +245,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         });
 
         mWeChatShareTimeLine = (Button) findViewById(R.id.wechat_share_timeline);
-        mWeChatShareTimeLine.setOnClickListener(new View.OnClickListener() {
+        mWeChatShareTimeLine.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 weChatAction(0);
@@ -250,7 +253,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         });
 
         mWeChatShareFriend = (Button) findViewById(R.id.wechat_share_friend);
-        mWeChatShareFriend.setOnClickListener(new View.OnClickListener() {
+        mWeChatShareFriend.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 weChatAction(1);
@@ -258,7 +261,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         });
 
         mWeiBoShare = (Button) findViewById(R.id.weibo_share);
-        mWeiBoShare.setOnClickListener(new View.OnClickListener() {
+        mWeiBoShare.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 weiBoAction();

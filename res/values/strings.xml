@@ -35,5 +35,6 @@
     <string name="camera_not_available">设备没有相机或者相机不可用</string>
     <string name="error">出现错误</string>
     <string name="save_hint">如果没有在图库中找到照片，请在DICM/Camera文件夹下寻找</string>
+    <string name="skip_start_up_page">下次不再显示</string>
 
 </resources>

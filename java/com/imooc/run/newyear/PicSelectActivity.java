@@ -8,11 +8,14 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -62,28 +65,28 @@ public class PicSelectActivity extends Activity {
         mPopupWindow.setBackgroundDrawable(new BitmapDrawable(getResources(), (Bitmap) null));
 
         //选择不同的图片时，改变回传的图片id
-        mPics.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        mPics.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 picId = getLargePictureID(checkedId);
             }
         });
 
-        mConfirm.setOnClickListener(new View.OnClickListener() {
+        mConfirm.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 backToMain(picId); //回传数据
             }
         });
 
-        mCancel.setOnClickListener(new View.OnClickListener() {
+        mCancel.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 PicSelectActivity.this.finish();
             }
         });
 
-        mRandomSelect.setOnClickListener(new View.OnClickListener() {
+        mRandomSelect.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 int seed = mPics.getChildCount();
@@ -133,7 +136,7 @@ public class PicSelectActivity extends Activity {
         PicSelectActivity.this.finish();
     }
 
-    private class mLongClickWatcher implements View.OnLongClickListener {
+    private class mLongClickWatcher implements OnLongClickListener {
 
         private Button mSelect;
         private ImageView mLargePic;
@@ -150,7 +153,7 @@ public class PicSelectActivity extends Activity {
             final RadioButton radioButton = (RadioButton) v;
             int largePicId = getLargePictureID(radioButton.getId()); //获得大图的id
 
-            mSelect.setOnClickListener(new View.OnClickListener() {
+            mSelect.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     picId = getLargePictureID(radioButton.getId());
