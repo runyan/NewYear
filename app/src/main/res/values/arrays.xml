@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="GalleryItemSelectionArray">
+        <item>图库</item>
+        <item>相机</item>
+        <item>默认图片</item>
+    </array>
+    <array name="WishTextItemSelectionArray">
+        <item>选择默认祝福语</item>
+        <item>输入祝福语</item>
+    </array>
+    <array name="WishTextItemArray">
+        <item>新年快乐</item>
+        <item>恭喜发财</item>
+        <item>年年有余</item>
+        <item>大吉大利</item>
+        <item>求发红包</item>
+    </array>
+
+</resources>
