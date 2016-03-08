@@ -40,6 +40,8 @@ import com.sina.weibo.sdk.constant.WBConstants;
 
 import java.io.FileInputStream;
 
+import me.drakeet.materialdialog.MaterialDialog;
+
 /**
  * 微博分享： https://open.weibo.com https://github.com/sinaweibosdk/weibo_android_sdk
  * <p/>
@@ -48,9 +50,12 @@ import java.io.FileInputStream;
 public class MainActivity extends Activity implements IWeiboHandler.Response {
 
     private ImageView mPhoto;
+    private ImageView mAbout;
+
     private Button mWeChatShareTimeLine;
     private Button mWeChatShareFriend;
     private Button mWeiBoShare;
+
     private EditText mWishText;
     private TextView mTextLength;
 
@@ -62,9 +67,6 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
 
     private Sensor mSensor;
     private SensorManager mSensorManager;
-
-    private AlertDialog.Builder mAlertBuilder;
-    private AlertDialog.Builder mSelectBuilder;
 
     private final String photoDirPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
             + "/Camera"; //相机拍照后图片的保存位置
@@ -161,9 +163,6 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         util = new Util(mContext, MainActivity.this);
         wishTexts = getResources().getStringArray(R.array.WishTextItemArray);
 
-        mAlertBuilder = util.getAlertDialog();
-        mSelectBuilder = util.getAlertDialog();
-
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
@@ -220,7 +219,8 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
             @Override
             public void onClick(View v) {
                 util.showMessage(getString(R.string.long_press_hint2), Toast.LENGTH_SHORT);
-                mAlertBuilder.setItems(getResources().getStringArray(R.array.GalleryItemSelectionArray), new DialogInterface.OnClickListener() { //选择图片位置
+                AlertDialog.Builder builder = util.getAlertDialog();
+                builder.setItems(getResources().getStringArray(R.array.GalleryItemSelectionArray), new DialogInterface.OnClickListener() { //选择图片位置
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
@@ -254,7 +254,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                         }
                     }
                 });
-                mAlertBuilder.show();
+                builder.show();
             }
         });
 
@@ -280,6 +280,16 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
             public void onClick(View v) {
                 weiBoShareUtil.weiBoAction(generateSpringCard(), true, true, false, false, false, false);
                 setVisibility(View.VISIBLE);
+            }
+        });
+
+        mAbout = (ImageView) findViewById(R.id.about);
+        mAbout.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MaterialDialog mMaterialDialog = new MaterialDialog(mContext);
+                mMaterialDialog.setTitle("关于").setMessage("版本：1.3.4\nAll Rights Reserved")
+                        .setCanceledOnTouchOutside(true).show();
             }
         });
     }
@@ -321,14 +331,16 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      * @param flag 是否可以输入祝福语
      */
     private void enterText(final boolean flag) {
-        mAlertBuilder.setItems(getResources().getStringArray(R.array.WishTextItemSelectionArray),
+        AlertDialog.Builder builder = util.getAlertDialog();
+        builder.setItems(getResources().getStringArray(R.array.WishTextItemSelectionArray),
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case 0: {  //选择默认祝福语
                                 //默认祝福语选择对话框
-                                mSelectBuilder.setTitle(getString(R.string.wish_text_selection))
+                                AlertDialog.Builder selector = util.getAlertDialog();
+                                selector.setTitle(getString(R.string.wish_text_selection))
                                         .setSingleChoiceItems(wishTexts, 0, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
@@ -337,7 +349,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                                                 util.closeInputMethod(mWishText); //选择祝福语后关闭屏幕键盘
                                             }
                                         });
-                                mSelectBuilder.show();
+                                selector.show();
                                 break;
                             }
                             case 1: { //选择输入祝福语
@@ -354,7 +366,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                         }
                     }
                 });
-        mAlertBuilder.show();
+        builder.show();
     }
 
     //摇晃设备监听类
@@ -430,6 +442,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWeChatShareTimeLine.setVisibility(visibility);
         mWeiBoShare.setVisibility(visibility);
         mTextLength.setVisibility(visibility);
+        mAbout.setVisibility(visibility);
     }
 
     /**

@@ -49,7 +49,7 @@ public class PicSelectActivity extends Activity {
     }
 
     private void initView() {
-        popupWindowUtil = new PopupWindowUtil(mContext, PicSelectActivity.this, R.layout.pic_select_popupwindow,
+        popupWindowUtil = new PopupWindowUtil(mContext, PicSelectActivity.this, R.layout.popupwindow_pic_select,
                 RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         mPics = (RadioGroup) findViewById(R.id.pics);
 

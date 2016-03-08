@@ -74,4 +74,14 @@
         android:layout_toRightOf="@+id/wechat_share_timeline"
         android:background="@drawable/share_weibo" />
 
+    <ImageView
+        android:id="@+id/about"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/about" />
+
 </RelativeLayout>
