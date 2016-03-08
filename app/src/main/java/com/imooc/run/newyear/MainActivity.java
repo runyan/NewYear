@@ -18,7 +18,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -31,31 +30,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.imooc.run.newyear.Util.Util;
+import com.imooc.run.newyear.Util.WeChatShareUtil;
+import com.imooc.run.newyear.Util.WeiBoShareUtil;
 import com.imooc.run.newyear.constants.Constants;
-import com.imooc.run.newyear.constants.WeChatConstants;
-import com.imooc.run.newyear.constants.WeiBoConstants;
-import com.sina.weibo.sdk.api.ImageObject;
-import com.sina.weibo.sdk.api.MusicObject;
-import com.sina.weibo.sdk.api.TextObject;
-import com.sina.weibo.sdk.api.VideoObject;
-import com.sina.weibo.sdk.api.VoiceObject;
-import com.sina.weibo.sdk.api.WebpageObject;
-import com.sina.weibo.sdk.api.WeiboMessage;
-import com.sina.weibo.sdk.api.WeiboMultiMessage;
 import com.sina.weibo.sdk.api.share.BaseResponse;
 import com.sina.weibo.sdk.api.share.IWeiboHandler;
 import com.sina.weibo.sdk.api.share.IWeiboShareAPI;
-import com.sina.weibo.sdk.api.share.SendMessageToWeiboRequest;
-import com.sina.weibo.sdk.api.share.SendMultiMessageToWeiboRequest;
-import com.sina.weibo.sdk.api.share.WeiboShareSDK;
 import com.sina.weibo.sdk.constant.WBConstants;
-import com.sina.weibo.sdk.exception.WeiboException;
-import com.tencent.mm.sdk.modelmsg.SendMessageToWX;
-import com.tencent.mm.sdk.modelmsg.WXImageObject;
-import com.tencent.mm.sdk.modelmsg.WXMediaMessage;
-import com.tencent.mm.sdk.modelmsg.WXWebpageObject;
-import com.tencent.mm.sdk.openapi.IWXAPI;
-import com.tencent.mm.sdk.openapi.WXAPIFactory;
 
 import java.io.FileInputStream;
 
@@ -73,8 +54,9 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
     private EditText mWishText;
     private TextView mTextLength;
 
-    private IWXAPI iwxapi; //微信分享接口实例
     private IWeiboShareAPI mWeiboShareAPI;//微博微博分享接口实例
+    private WeiBoShareUtil weiBoShareUtil;
+    private WeChatShareUtil weChatShareUtil;
 
     private final Context mContext = MainActivity.this;
 
@@ -112,10 +94,6 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         initViews(); //初始化显示控件;
         Util.verifyStoragePermissions(MainActivity.this); //查询应用是否拥有读写存储权限，没有则询问用户是否授权
 
-        //注册app到微博，微信
-        regToWX();
-        regToWB();
-
         if (savedInstanceState != null) {
             mWeiboShareAPI.handleWeiboResponse(getIntent(), this);
         }
@@ -128,10 +106,11 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-
-        // 从当前应用唤起微博并进行分享后，返回到当前应用时，需要在此处调用该函数
-        // 来接收微博客户端返回的数据；执行成功，返回 true，并调用
-        // {@link IWeiboHandler.Response#onResponse}；失败返回 false，不调用上述回调
+        /**
+         * 从当前应用唤起微博并进行分享后，返回到当前应用时，需要在此处调用该函数
+         * 来接收微博客户端返回的数据；执行成功，返回 true，并调用
+         * {@link IWeiboHandler.Response#onResponse}；失败返回 false，不调用上述回调
+         */
         mWeiboShareAPI.handleWeiboResponse(intent, this);
     }
 
@@ -176,6 +155,9 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      * 初始化显示界面
      */
     private void initViews() {
+        weiBoShareUtil = new WeiBoShareUtil(mContext, MainActivity.this);
+        mWeiboShareAPI = weiBoShareUtil.getmWeiboShareAPI();
+        weChatShareUtil = new WeChatShareUtil(mContext, MainActivity.this);
         util = new Util(mContext, MainActivity.this);
         wishTexts = getResources().getStringArray(R.array.WishTextItemArray);
 
@@ -296,7 +278,8 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWeiBoShare.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                weiBoAction();
+                weiBoShareUtil.weiBoAction(generateSpringCard(), true, true, false, false, false, false);
+                setVisibility(View.VISIBLE);
             }
         });
     }
@@ -430,29 +413,6 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
     };
 
     /**
-     * 注册微信分享api
-     */
-    private void regToWX() {
-        //通过WXAPIFactory工厂，获取IWXAPI的实例
-        iwxapi = WXAPIFactory.createWXAPI(mContext, WeChatConstants.APP_ID, false);
-        //将应用的appId注册到微信
-        iwxapi.registerApp(WeChatConstants.APP_ID);
-    }
-
-    /**
-     * 注册微博分享api
-     */
-    private void regToWB() {
-        // 创建微博分享接口实例
-        mWeiboShareAPI = WeiboShareSDK.createWeiboAPI(this, WeiBoConstants.APP_KEY);
-
-        // 注册第三方应用到微博客户端中，注册成功后该应用将显示在微博的应用列表中。
-        // 但该附件栏集成分享权限需要合作申请，详情请查看 Demo 提示
-        // NOTE：请务必提前注册，即界面初始化的时候或是应用程序初始化时，进行注册
-        mWeiboShareAPI.registerApp();
-    }
-
-    /**
      * 设置分享文本的字体，隐藏光标
      */
     private void setTextStyle() {
@@ -549,48 +509,15 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      */
 
     /**
-     * 判断微信是否安装
-     *
-     * @return true 微信已安装 false 微信未安装
-     */
-    private boolean checkWXInstalled() {
-        return iwxapi.isWXAppInstalled();
-    }
-
-    /**
      * 处理微信分享动作
      *
      * @param flag 0为分享到朋友圈 1为分享给微信好友
      */
     private void weChatAction(int flag) {
-        if (!checkWXInstalled()) {
-            util.showMessage(getString(R.string.weiChat_not_installed), Toast.LENGTH_SHORT);
-        } else {
-            weChatShare(flag);
-            setVisibility(View.VISIBLE);
-        }
+        weChatShareUtil.weChatAction(flag, generateSpringCard());
+        setVisibility(View.VISIBLE);
     }
 
-    /**
-     * 微信分享
-     *
-     * @param flag 分享位置（朋友圈或微信好友）
-     */
-    private void weChatShare(int flag) {
-        //初始化一个WXWebpageObject对象
-        WXWebpageObject webPage = new WXWebpageObject();
-        //用WXWebpageObject对象初始化一个WXMediaMessage 对象，填写信息
-        WXMediaMessage msg = new WXMediaMessage(webPage);
-        msg.mediaObject = new WXImageObject(generateSpringCard());
-
-        //构造一个Req
-        SendMessageToWX.Req req = new SendMessageToWX.Req();
-        req.transaction = String.valueOf(System.currentTimeMillis()); //transaction字段用于唯一标识一个请求
-        req.message = msg;
-        req.scene = flag == 0 ? SendMessageToWX.Req.WXSceneTimeline : SendMessageToWX.Req.WXSceneSession; //根据flag判断发送位置
-        //调用api接口发送数据到微信
-        iwxapi.sendReq(req);
-    }
 
     /**
      * 微博分享部分
@@ -620,175 +547,4 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
             }
         }
     }
-
-    /**
-     * 检查微博客户端是否安装
-     *
-     * @return true 已安装微博客户端 false 未安装微博客户端
-     */
-    private boolean checkWBInstalled() {
-        return mWeiboShareAPI.isWeiboAppInstalled();
-    }
-
-    /**
-     * 第三方应用发送请求消息到微博，唤起微博分享界面。
-     *
-     * @see {@link #sendMultiMessage} 或者 {@link #sendSingleMessage}
-     */
-    private void sendMessage(boolean hasText, boolean hasImage,
-                             boolean hasWebpage, boolean hasMusic, boolean hasVideo, boolean hasVoice) {
-
-
-        if (mWeiboShareAPI.isWeiboAppSupportAPI()) {
-            int supportApi = mWeiboShareAPI.getWeiboAppSupportAPI();
-            if (supportApi >= 10351) {
-                sendMultiMessage(hasText, hasImage, hasWebpage, hasMusic, hasVideo, hasVoice);
-            } else {
-                sendSingleMessage(hasText, hasImage, hasWebpage, hasMusic, hasVideo);
-            }
-        } else {
-            util.showMessage(getString(R.string.weiBo_not_supported), Toast.LENGTH_SHORT);
-        }
-    }
-
-    /**
-     * 第三方应用发送请求消息到微博，唤起微博分享界面。
-     * 注意：当 {@link IWeiboShareAPI#getWeiboAppSupportAPI()} >= 10351 时，支持同时分享多条消息，
-     * 同时可以分享文本、图片以及其它媒体资源（网页、音乐、视频、声音中的一种）。
-     *
-     * @param hasText    分享的内容是否有文本
-     * @param hasImage   分享的内容是否有图片
-     * @param hasWebpage 分享的内容是否有网页
-     * @param hasMusic   分享的内容是否有音乐
-     * @param hasVideo   分享的内容是否有视频
-     * @param hasVoice   分享的内容是否有声音
-     */
-    private void sendMultiMessage(boolean hasText, boolean hasImage, boolean hasWebpage,
-                                  boolean hasMusic, boolean hasVideo, boolean hasVoice) {
-        // 1. 初始化微博的分享消息
-        WeiboMultiMessage weiboMessage = new WeiboMultiMessage();
-        if (hasText) {
-            weiboMessage.textObject = getTextObj();
-        }
-
-        if (hasImage) {
-            weiboMessage.imageObject = getImageObj();
-        }
-
-        // 用户可以分享其它媒体资源（网页、音乐、视频、声音中的一种）
-        if (hasWebpage) {
-            weiboMessage.mediaObject = new WebpageObject();
-        }
-        if (hasMusic) {
-            weiboMessage.mediaObject = new MusicObject();
-        }
-        if (hasVideo) {
-            weiboMessage.mediaObject = new VideoObject();
-        }
-        if (hasVoice) {
-            weiboMessage.mediaObject = new VoiceObject();
-        }
-
-        // 2. 初始化从第三方到微博的消息请求
-        SendMultiMessageToWeiboRequest request = new SendMultiMessageToWeiboRequest();
-        // 用transaction唯一标识一个请求
-        request.transaction = String.valueOf(System.currentTimeMillis());
-        request.multiMessage = weiboMessage;
-
-        // 3. 发送请求消息到微博，唤起微博分享界面
-        mWeiboShareAPI.sendRequest(MainActivity.this, request);
-    }
-
-    /**
-     * 第三方应用发送请求消息到微博，唤起微博分享界面。
-     * 当{@link IWeiboShareAPI#getWeiboAppSupportAPI()} < 10351 时，只支持分享单条消息，即
-     * 文本、图片、网页、音乐、视频中的一种，不支持Voice消息。
-     *
-     * @param hasText    分享的内容是否有文本
-     * @param hasImage   分享的内容是否有图片
-     * @param hasWebpage 分享的内容是否有网页
-     * @param hasMusic   分享的内容是否有音乐
-     * @param hasVideo   分享的内容是否有视频
-     */
-    private void sendSingleMessage(boolean hasText, boolean hasImage, boolean hasWebpage,
-                                   boolean hasMusic, boolean hasVideo) {
-
-        // 1. 初始化微博的分享消息
-        WeiboMessage weiboMessage = new WeiboMessage();
-        if (hasText) {
-            weiboMessage.mediaObject = getTextObj();
-        }
-        if (hasImage) {
-            weiboMessage.mediaObject = getImageObj();
-        }
-        // 用户可以分享其它媒体资源（网页、音乐、视频、声音中的一种）
-        if (hasWebpage) {
-            weiboMessage.mediaObject = new WebpageObject();
-        }
-        if (hasMusic) {
-            weiboMessage.mediaObject = new MusicObject();
-        }
-        if (hasVideo) {
-            weiboMessage.mediaObject = new VideoObject();
-        }
-
-        // 2. 初始化从第三方到微博的消息请求
-        SendMessageToWeiboRequest request = new SendMessageToWeiboRequest();
-        // 用transaction唯一标识一个请求
-        request.transaction = String.valueOf(System.currentTimeMillis());
-        request.message = weiboMessage;
-
-        // 3. 发送请求消息到微博，唤起微博分享界面
-        mWeiboShareAPI.sendRequest(MainActivity.this, request);
-    }
-
-    /**
-     * 获取分享的文本模板。
-     *
-     * @return 分享的文本模板
-     */
-    @NonNull
-    private String getSharedText() {
-        return getString(R.string.app_name);
-    }
-
-    /**
-     * 创建文本消息对象。
-     *
-     * @return 文本消息对象。
-     */
-    private TextObject getTextObj() {
-        TextObject textObject = new TextObject();
-        textObject.text = getSharedText();
-        return textObject;
-    }
-
-    /**
-     * 创建图片消息对象。
-     *
-     * @return 图片消息对象。
-     */
-    private ImageObject getImageObj() {
-        ImageObject imageObject = new ImageObject();
-        imageObject.setImageObject(generateSpringCard());
-        return imageObject;
-    }
-
-
-    /**
-     * 处理微博分享动作
-     */
-    private void weiBoAction() {
-        try {
-            if (!checkWBInstalled()) {
-                util.showMessage(getString(R.string.weiBo_not_installed), Toast.LENGTH_SHORT);
-            } else {
-                sendMessage(true, true, false, false, false, false);
-                setVisibility(View.VISIBLE);
-            }
-        } catch (WeiboException e) {
-            util.showErrorMsg(e);
-        }
-    }
-
 }
