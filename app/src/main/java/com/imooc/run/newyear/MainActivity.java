@@ -13,6 +13,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -278,8 +279,8 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWeiBoShare.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                weiBoShareUtil.weiBoAction(generateSpringCard(), true, true, false, false, false, false);
-                setVisibility(View.VISIBLE);
+                weiBoAction();
+
             }
         });
 
@@ -287,9 +288,22 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mAbout.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                MaterialDialog mMaterialDialog = new MaterialDialog(mContext);
-                mMaterialDialog.setTitle("关于").setMessage("版本：1.3.4\nAll Rights Reserved")
-                        .setCanceledOnTouchOutside(true).show();
+                final MediaPlayer player = MediaPlayer.create(mContext, R.raw.happynewyear);
+                player.start();
+                final MaterialDialog mMaterialDialog = new MaterialDialog(mContext);
+                mMaterialDialog.setTitle(getString(R.string.about)).setMessage(getString(R.string.about_text))
+                        .setNegativeButton(getString(R.string.confirm), new OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mMaterialDialog.dismiss();
+                            }
+                        })
+                        .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                player.stop();
+                            }
+                        }).show();
             }
         });
     }
@@ -301,7 +315,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      */
     private int getAutoGeneratePicId() {
         int basePicId = R.drawable.largep1;
-        int random = util.getRandomNumber(6);
+        int random = util.getRandomNumber(Constants.DEFAULT_PIC_NUMBER);
         return random + basePicId;
     }
 
@@ -311,8 +325,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      * @return 随机产生的默认祝福语id
      */
     private int getAutoGenerateWishTextId() {
-        int wishTextLength = wishTexts.length;
-        return util.getRandomNumber(wishTextLength);
+        return util.getRandomNumber(wishTexts.length);
     }
 
     /**
@@ -416,7 +429,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
 
         @Override
         public void afterTextChanged(Editable s) {
-            String str = "还能输入" + remainTextLength + "个字";
+            String str = getString(R.string.you_can_enter) + remainTextLength + getString(R.string.words);
             mTextLength.setText(str);
             if (temp.length() >= 10) {
                 util.showMessage(getString(R.string.text_too_long), Toast.LENGTH_SHORT);
@@ -468,23 +481,27 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                     Bitmap bitmap = BitmapFactory.decodeStream(fis); //从照片的输入流中将图片解码为Bitmap
                     mPhoto.setImageBitmap(bitmap); //设置显示图片
                     //询问是否将图片保存在图库
-                    AlertDialog.Builder builder = util.getAlertDialog();
-                    builder.setMessage(R.string.save_photo);
-                    builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    final MaterialDialog mMaterialDialog = new MaterialDialog(mContext);
+                    mMaterialDialog.setMessage(R.string.save_photo);
+                    mMaterialDialog.setPositiveButton(R.string.yes, new OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(View v) {
                             util.showMessage(getString(R.string.save_hint), Toast.LENGTH_SHORT);
+                            mMaterialDialog.dismiss();
                         }
                     });
-                    builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() { //如果不保存
+                    mMaterialDialog.setNegativeButton(R.string.no, new OnClickListener() {//如果不保存
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(View v) {
                             if (!Util.deleteMedia(photoPath)) {
                                 util.showMessage(getString(R.string.delete_fail), Toast.LENGTH_SHORT);
+                                mMaterialDialog.dismiss();
                             }
+                            mMaterialDialog.dismiss();
                         }
                     });
-                    builder.show();
+                    mMaterialDialog.setCanceledOnTouchOutside(false);
+                    mMaterialDialog.show();
                 } catch (Exception e) {
                     util.showErrorMsg(e);
                 } finally {
@@ -501,7 +518,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
 
         if (requestCode == Constants.REQ_DEFAULT) { //选择默认图片返回成功
             if (resultCode == Constants.RES_DEFAULT) {
-                int picId = Integer.parseInt(data.getStringExtra("picId")); //获得所选图片
+                int picId = Integer.parseInt(data.getStringExtra("picId")); //获得所选图片id
                 mPhoto.setImageDrawable(util.getDrawable(picId));
             }
         }
@@ -524,9 +541,37 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
     /**
      * 处理微信分享动作
      *
-     * @param flag 0为分享到朋友圈 1为分享给微信好友
+     * @param flag 分享位置 0为分享到朋友圈 1为分享给微信好友
      */
-    private void weChatAction(int flag) {
+    private void weChatAction(final int flag) {
+        if (!util.checkWifiAvailability()) {
+            final MaterialDialog materialDialog = new MaterialDialog(mContext);
+            materialDialog.setMessage(getString(R.string.wifi_not_enabled))
+                    .setPositiveButton(R.string.yes, new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            prepareForWeChatShare(flag);
+                            materialDialog.dismiss();
+                        }
+                    })
+                    .setNegativeButton(R.string.no, new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            materialDialog.dismiss();
+                        }
+                    })
+                    .show();
+        } else {
+            prepareForWeChatShare(flag);
+        }
+    }
+
+    /**
+     * 为微信分享做准备
+     *
+     * @param flag 分享位置 0为分享到朋友圈 1为分享给微信好友
+     */
+    private void prepareForWeChatShare(int flag) {
         weChatShareUtil.weChatAction(flag, generateSpringCard());
         setVisibility(View.VISIBLE);
     }
@@ -535,6 +580,39 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
     /**
      * 微博分享部分
      */
+
+    /**
+     * 处理微博分享动作
+     */
+    private void weiBoAction() {
+        if (!util.checkWifiAvailability()) {
+            final MaterialDialog materialDialog = new MaterialDialog(mContext);
+            materialDialog.setMessage(getString(R.string.wifi_not_enabled))
+                    .setPositiveButton(R.string.yes, new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            prepareForWeiBoShare();
+                            materialDialog.dismiss();
+                        }
+                    })
+                    .setNegativeButton(R.string.no, new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            materialDialog.dismiss();
+                        }
+                    }).show();
+        } else {
+            prepareForWeiBoShare();
+        }
+    }
+
+    /**
+     * 为微博分享做准备
+     */
+    private void prepareForWeiBoShare() {
+        weiBoShareUtil.weiBoAction(generateSpringCard(), true, true, false, false, false, false);
+        setVisibility(View.VISIBLE);
+    }
 
     /**
      * 接收微客户端博请求的数据。

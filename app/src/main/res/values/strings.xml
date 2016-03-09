@@ -37,5 +37,11 @@
     <string name="info">提示</string>
     <string name="selecting">正在选择</string>
     <string name="generating">生成中，请稍候</string>
+    <string name="about">关于</string>
+    <string name="about_text">版本：1.4.0\nAll Rights Reserved</string>
+    <string name="you_can_enter">还能输入</string>
+    <string name="words">个字</string>
+    <string name="network_unavailable">网络不可用</string>
+    <string name="wifi_not_enabled">检测到你正在使用移动网络\n继续使用可能会产生流量费用\n是否继续？</string>
 
 </resources>

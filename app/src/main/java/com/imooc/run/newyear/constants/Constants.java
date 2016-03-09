@@ -11,4 +11,6 @@ public interface Constants {
 
     int VIBRATE_SINGLE = 1;
     int VIBRATE_DOUBLE = 2;
+
+    int DEFAULT_PIC_NUMBER = 6;
 }

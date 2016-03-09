@@ -7,7 +7,10 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
@@ -285,6 +288,41 @@ public class Util {
      */
     public int getRandomNumber(int seed) {
         return new Random().nextInt(seed);
+    }
+
+    /**
+     * 检查是否有可用的网络
+     *
+     * @return true 有可用的网络, false 没有可用的网络
+     */
+    private boolean checkNetworkAvailability() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (null != networkInfo) {
+            if (networkInfo.isAvailable()) {
+                return true;
+            } else {
+                showMessage(context.getString(R.string.network_unavailable), Toast.LENGTH_SHORT);
+                return false;
+            }
+        } else {
+            showMessage(context.getString(R.string.error), Toast.LENGTH_SHORT);
+            return false;
+        }
+    }
+
+    /**
+     * 检查wifi连接状态
+     *
+     * @return true wifi已连接， false wifi未连接
+     */
+    public boolean checkWifiAvailability() {
+        if (!checkNetworkAvailability()) {
+            return false;
+        } else {
+            WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+            return wifiManager.isWifiEnabled();
+        }
     }
 
 }
