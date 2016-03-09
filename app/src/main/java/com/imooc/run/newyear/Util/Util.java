@@ -12,6 +12,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Handler;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -33,8 +34,8 @@ import java.util.Random;
 
 public class Util {
 
-    private Context context;
-    private Activity activity;
+    private final Context context;
+    private final Activity activity;
 
     public Util(Context context, Activity activity) {
         this.context = context;
@@ -70,7 +71,7 @@ public class Util {
      * @return true 如果安卓版本大于4.0, false 如果安卓版本小于4.0
      */
     @Contract(pure = true)
-    public static boolean versionCheck() {
+    private boolean versionCheck() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
     }
 
@@ -79,6 +80,23 @@ public class Util {
      */
     public void exit() {
         activity.finish();
+        System.exit(0);
+    }
+
+    /**
+     * 当系统版本小于4.0时退出程序
+     */
+    public void verifyVersion() {
+        if (!versionCheck()) {
+            showMessage(context.getString(R.string.version_error), Toast.LENGTH_LONG);
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    exit();
+                }
+            }, 1000);
+        }
     }
 
     /**
@@ -249,7 +267,7 @@ public class Util {
      *
      * @param mediaStoragePath 文件夹位置
      * @param mediaPath        文件位置
-     * @return 视频的Uri
+     * @return 媒体文件的Uri
      */
     public Uri getOutputMediaFileUri(String mediaStoragePath, String mediaPath) {
         return Uri.fromFile(getOutputMediaFile(mediaStoragePath, mediaPath));
@@ -260,10 +278,10 @@ public class Util {
      *
      * @param mediaStoragePath 文件夹位置
      * @param mediaPath        文件位置
-     * @return 要分享的视频文件
+     * @return 要分享的媒体文件
      */
     @Nullable
-    public File getOutputMediaFile(String mediaStoragePath, String mediaPath) {
+    private File getOutputMediaFile(String mediaStoragePath, String mediaPath) {
         File mediaFile;
         try {
             File mediaStorageDir = new File(mediaStoragePath);

@@ -10,10 +10,14 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
+import com.imooc.run.newyear.Util.Util;
+
 /**
  * 启动页面
  */
 public class SplashActivity extends Activity {
+
+    private Util util;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,12 +25,15 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.activity_splash);
 
         initView();
+
+        util.verifyVersion();
     }
 
     /**
      * 界面初始化
      */
     private void initView() {
+        util = new Util(SplashActivity.this, SplashActivity.this);
         SharedPreferences pref = getSharedPreferences("appear", MODE_PRIVATE);
         final Editor editor = pref.edit();
 
@@ -68,4 +75,6 @@ public class SplashActivity extends Activity {
             startActivity(intent);
         }
     }
+
+
 }

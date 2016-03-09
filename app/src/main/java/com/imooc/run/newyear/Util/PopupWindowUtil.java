@@ -11,8 +11,8 @@ import android.widget.RelativeLayout;
 
 public class PopupWindowUtil {
 
-    private PopupWindow popupWindow;
-    private Context context;
+    private final PopupWindow popupWindow;
+    private final Context context;
 
     public PopupWindowUtil(Context context, Activity activity, int resId, int width, int height) {
         View popupView = activity.getLayoutInflater().inflate(resId, new RelativeLayout(context), false);
@@ -63,10 +63,4 @@ public class PopupWindowUtil {
         popupWindow.showAsDropDown(parent);
     }
 
-    /**
-     * 关闭弹窗
-     */
-    public void closePopupWindow() {
-        popupWindow.dismiss();
-    }
 }

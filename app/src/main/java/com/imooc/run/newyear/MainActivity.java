@@ -43,11 +43,6 @@ import java.io.FileInputStream;
 
 import me.drakeet.materialdialog.MaterialDialog;
 
-/**
- * 微博分享： https://open.weibo.com https://github.com/sinaweibosdk/weibo_android_sdk
- * <p/>
- * 微信分享：https://open.weixin.qq.com/
- */
 public class MainActivity extends Activity implements IWeiboHandler.Response {
 
     private ImageView mPhoto;
@@ -60,11 +55,13 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
     private EditText mWishText;
     private TextView mTextLength;
 
-    private IWeiboShareAPI mWeiboShareAPI;//微博微博分享接口实例
+    private IWeiboShareAPI mWeiBoShareAPI;//微博微博分享接口实例
     private WeiBoShareUtil weiBoShareUtil;
     private WeChatShareUtil weChatShareUtil;
 
     private final Context mContext = MainActivity.this;
+
+    private boolean hasClicked = false;
 
     private Sensor mSensor;
     private SensorManager mSensorManager;
@@ -74,8 +71,6 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
     private final String photoPath = photoDirPath + "/img.png";
 
     private final int maxTextLength = 10; //可以输入的最大文本长度
-
-    private boolean hasClicked = false; //判断是否已被点击
 
     private boolean hasShaken = false; //判断是否已经摇晃的标志位
 
@@ -89,16 +84,14 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         overridePendingTransition(R.anim.zoom_in, R.anim.zoom_out); //设置切换动画
         setContentView(R.layout.activity_main);
 
-        if (!Util.versionCheck()) {
-            util.showMessage(getString(R.string.version_error), Toast.LENGTH_LONG);
-            util.exit();
-        }
+        initViews(); //初始化
 
-        initViews(); //初始化显示控件;
+        util.verifyVersion();
+
         Util.verifyStoragePermissions(MainActivity.this); //查询应用是否拥有读写存储权限，没有则询问用户是否授权
 
         if (savedInstanceState != null) {
-            mWeiboShareAPI.handleWeiboResponse(getIntent(), this);
+            mWeiBoShareAPI.handleWeiboResponse(getIntent(), this);
         }
 
     }
@@ -114,7 +107,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
          * 来接收微博客户端返回的数据；执行成功，返回 true，并调用
          * {@link IWeiboHandler.Response#onResponse}；失败返回 false，不调用上述回调
          */
-        mWeiboShareAPI.handleWeiboResponse(intent, this);
+        mWeiBoShareAPI.handleWeiboResponse(intent, this);
     }
 
     @Override
@@ -159,7 +152,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      */
     private void initViews() {
         weiBoShareUtil = new WeiBoShareUtil(mContext, MainActivity.this);
-        mWeiboShareAPI = weiBoShareUtil.getmWeiboShareAPI();
+        mWeiBoShareAPI = weiBoShareUtil.getMWeiBoShareAPI();
         weChatShareUtil = new WeChatShareUtil(mContext, MainActivity.this);
         util = new Util(mContext, MainActivity.this);
         wishTexts = getResources().getStringArray(R.array.WishTextItemArray);

@@ -16,15 +16,15 @@ import com.tencent.mm.sdk.openapi.WXAPIFactory;
 
 public class WeChatShareUtil {
 
-    private IWXAPI iwxapi; //微信分享接口实例
-    private Context mContext;
-    private Util util;
+    private final IWXAPI iwxapi; //微信分享接口实例
+    private final Context mContext;
+    private final Util util;
 
     public WeChatShareUtil(Context context, Activity activity) {
         mContext = context;
         util = new Util(context, activity);
 
-        iwxapi = WXAPIFactory.createWXAPI(mContext, WeChatConstants.APP_ID, false); //通过WXAPIFactory工厂，获取IWXAPI的实例
+        iwxapi = WXAPIFactory.createWXAPI(mContext, WeChatConstants.APP_ID, false); //通过WXAPIFactory工厂，获取实例
         iwxapi.registerApp(WeChatConstants.APP_ID);//将应用的appId注册到微信
     }
 
@@ -44,8 +44,8 @@ public class WeChatShareUtil {
      * @param picture 要分享的图片
      */
     private void weChatShare(int flag, Bitmap picture) {
-        WXWebpageObject webPage = new WXWebpageObject();//初始化一个WXWebpageObject对象
-        WXMediaMessage msg = new WXMediaMessage(webPage);//用WXWebpageObject对象初始化一个WXMediaMessage 对象，填写信息
+        WXWebpageObject webPage = new WXWebpageObject();//初始化一个WXWebPageObject对象
+        WXMediaMessage msg = new WXMediaMessage(webPage);//用WXWebPageObject对象初始化一个WXMediaMessage 对象，填写信息
         msg.mediaObject = new WXImageObject(picture);
 
         SendMessageToWX.Req req = new SendMessageToWX.Req();//构造一个Req
