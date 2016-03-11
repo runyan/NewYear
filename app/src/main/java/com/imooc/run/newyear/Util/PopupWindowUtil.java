@@ -63,4 +63,11 @@ public class PopupWindowUtil {
         popupWindow.showAsDropDown(parent);
     }
 
+    /**
+     * 关闭弹窗
+     */
+    public void closePopuoWindow() {
+        popupWindow.dismiss();
+    }
+
 }

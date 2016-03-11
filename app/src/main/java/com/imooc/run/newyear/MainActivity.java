@@ -306,7 +306,9 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                         .setOnDismissListener(new DialogInterface.OnDismissListener() {
                             @Override
                             public void onDismiss(DialogInterface dialog) {
-                                player.stop();
+                                if (player.isPlaying()) {
+                                    player.stop();
+                                }
                             }
                         }).show();
             }

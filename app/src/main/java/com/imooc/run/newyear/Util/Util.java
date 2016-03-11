@@ -12,6 +12,7 @@ import android.gesture.GestureLibrary;
 import android.gesture.GestureOverlayView;
 import android.gesture.Prediction;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -25,6 +26,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +40,8 @@ import org.jetbrains.annotations.Contract;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
+
+import pl.droidsonroids.gif.GifImageView;
 
 public class Util {
 
@@ -355,7 +360,7 @@ public class Util {
      * @param resId GestureOverlayView的id
      */
     public void useGesture(int resId) {
-        GestureOverlayView v = (GestureOverlayView) activity.findViewById(resId);
+        final GestureOverlayView v = (GestureOverlayView) activity.findViewById(resId);
         final GestureLibrary library = GestureLibraries.fromRawResource(context, R.raw.gestures);
         library.load();
         v.addOnGesturePerformedListener(new GestureOverlayView.OnGesturePerformedListener() {
@@ -372,9 +377,35 @@ public class Util {
                                 break;
                             }
                             case "wish": {
-                                String[] wishes = context.getResources().getStringArray(R.array.WishTextItemArray);
-                                int wishId = getRandomNumber(wishes.length);
-                                showMessage(wishes[wishId], 1000);
+                                if (activity.getClass() == MainActivity.class) {
+                                    int[] gifIds = {R.drawable.kumamon1, R.drawable.kumamon2,
+                                            R.drawable.kumamon3, R.drawable.kumamon4, R.drawable.kumamon5};
+                                    String[] wishTexts = context.getResources().getStringArray(R.array.WishTextItemArray);
+
+                                    int gifId = gifIds[getRandomNumber(gifIds.length)];
+                                    String wishText = wishTexts[getRandomNumber(wishTexts.length)];
+
+                                    final PopupWindowUtil popupWindow = new PopupWindowUtil(context, activity, R.layout.popupwindow_show_wish,
+                                            RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                                    popupWindow.closeOnOutside(true);
+                                    Button mClose = (Button) popupWindow.getView(R.id.close);
+
+                                    mClose.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            popupWindow.closePopuoWindow();
+                                        }
+                                    });
+                                    GifImageView gifImage = (GifImageView) popupWindow.getView(R.id.kumamon);
+                                    gifImage.setImageResource(gifId);
+
+                                    TextView mWishText = (TextView) popupWindow.getView(R.id.wish_text);
+                                    mWishText.setText(wishText);
+                                    mWishText.setTypeface(Typeface.createFromAsset(context.getAssets(), "fonts/test.ttf"));
+
+                                    popupWindow.setAnimation(R.style.anim_menu_bottomBar);
+                                    popupWindow.showAtCenter(v);
+                                }
                                 break;
                             }
                         }
