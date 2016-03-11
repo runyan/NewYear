@@ -361,16 +361,23 @@ public class Util {
         v.addOnGesturePerformedListener(new GestureOverlayView.OnGesturePerformedListener() {
             @Override
             public void onGesturePerformed(GestureOverlayView overlay, Gesture gesture) {
-                ArrayList<Prediction> gestures = library.recognize(gesture);
-                Prediction prediction = gestures.get(0);
-                if (prediction.score >= 5.0) {
-                    if (prediction.name.equals("previous")) {
-                        Intent intent = new Intent(context, MainActivity.class);
-                        context.startActivity(intent);
-                    } else if (prediction.name.equals("wish")) {
-                        String[] wishes = context.getResources().getStringArray(R.array.WishTextItemArray);
-                        int wishId = getRandomNumber(wishes.length);
-                        showMessage(wishes[wishId], 1000);
+                ArrayList<Prediction> predictions = library.recognize(gesture);
+                if (predictions.size() > 0) {
+                    Prediction prediction = predictions.get(0);
+                    if (prediction.score >= 3.0) {
+                        switch (prediction.name) {
+                            case "previous": {
+                                Intent intent = new Intent(context, MainActivity.class);
+                                context.startActivity(intent);
+                                break;
+                            }
+                            case "wish": {
+                                String[] wishes = context.getResources().getStringArray(R.array.WishTextItemArray);
+                                int wishId = getRandomNumber(wishes.length);
+                                showMessage(wishes[wishId], 1000);
+                                break;
+                            }
+                        }
                     }
                 }
             }

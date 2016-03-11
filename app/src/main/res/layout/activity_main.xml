@@ -10,94 +10,101 @@
         android:id="@+id/gestureViewMain"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gestureColor="@android:color/transparent" />
+        android:gestureColor="@android:color/transparent">
 
-    <ImageView
-        android:id="@+id/photo"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="80dp"
-        android:adjustViewBounds="true"
-        android:background="@color/red"
-        android:contentDescription="@string/app_name"
-        android:padding="3dp"
-        android:src="@drawable/default_bg" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/photo"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/word"
-        android:gravity="center"
-        android:hint="@string/wish"
-        android:maxLength="10"
-        android:textColor="@color/yellow"
-        android:textSize="20sp" />
+            <ImageView
+                android:id="@+id/photo"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="80dp"
+                android:adjustViewBounds="true"
+                android:background="@color/red"
+                android:contentDescription="@string/app_name"
+                android:padding="3dp"
+                android:src="@drawable/default_bg" />
 
-    <TextView
-        android:id="@+id/text_length"
-        android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/text" />
+            <EditText
+                android:id="@+id/text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/photo"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/word"
+                android:gravity="center"
+                android:hint="@string/wish"
+                android:maxLength="10"
+                android:textColor="@color/yellow"
+                android:textSize="20sp" />
 
-    <Button
-        android:id="@+id/wechat_share_friend"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/text"
-        android:layout_marginLeft="60dp"
-        android:layout_marginStart="60dp"
-        android:layout_marginTop="30dp"
-        android:background="@drawable/share_friend" />
+            <TextView
+                android:id="@+id/text_length"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/text" />
 
-    <Button
-        android:id="@+id/wechat_share_timeline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/text"
-        android:layout_marginLeft="40dp"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="30dp"
-        android:layout_toEndOf="@+id/wechat_share_friend"
-        android:layout_toRightOf="@+id/wechat_share_friend"
-        android:background="@drawable/share_timeline" />
+            <Button
+                android:id="@+id/wechat_share_friend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/text"
+                android:layout_marginLeft="60dp"
+                android:layout_marginStart="60dp"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/share_friend" />
 
-    <Button
-        android:id="@+id/weibo_share"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/text"
-        android:layout_marginLeft="40dp"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="30dp"
-        android:layout_toEndOf="@+id/wechat_share_timeline"
-        android:layout_toRightOf="@+id/wechat_share_timeline"
-        android:background="@drawable/share_weibo" />
+            <Button
+                android:id="@+id/wechat_share_timeline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/text"
+                android:layout_marginLeft="40dp"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="30dp"
+                android:layout_toEndOf="@+id/wechat_share_friend"
+                android:layout_toRightOf="@+id/wechat_share_friend"
+                android:background="@drawable/share_timeline" />
 
-    <ImageView
-        android:id="@+id/help"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:contentDescription="@string/app_name"
-        android:src="@drawable/help" />
+            <Button
+                android:id="@+id/weibo_share"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/text"
+                android:layout_marginLeft="40dp"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="30dp"
+                android:layout_toEndOf="@+id/wechat_share_timeline"
+                android:layout_toRightOf="@+id/wechat_share_timeline"
+                android:background="@drawable/share_weibo" />
 
-    <ImageView
-        android:id="@+id/about"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:contentDescription="@string/app_name"
-        android:src="@drawable/about" />
+            <ImageView
+                android:id="@+id/help"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/help" />
 
+            <ImageView
+                android:id="@+id/about"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/about" />
+
+        </RelativeLayout>
+
+    </android.gesture.GestureOverlayView>
 </RelativeLayout>
