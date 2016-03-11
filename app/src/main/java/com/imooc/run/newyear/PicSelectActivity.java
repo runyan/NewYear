@@ -42,6 +42,7 @@ public class PicSelectActivity extends Activity {
         util = new Util(mContext, PicSelectActivity.this);
         util.smoothSwitchScreen();
         setContentView(R.layout.activity_pic_select);
+        util.useGesture(R.id.gestureViewPicSelect);
 
         initView();
 

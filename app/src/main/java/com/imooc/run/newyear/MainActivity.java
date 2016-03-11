@@ -47,6 +47,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
 
     private ImageView mPhoto;
     private ImageView mAbout;
+    private ImageView mHelp;
 
     private Button mWeChatShareTimeLine;
     private Button mWeChatShareFriend;
@@ -86,9 +87,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
 
         initViews(); //初始化
 
-        util.verifyVersion();
-
-        Util.verifyStoragePermissions(MainActivity.this); //查询应用是否拥有读写存储权限，没有则询问用户是否授权
+        verification();
 
         if (savedInstanceState != null) {
             mWeiBoShareAPI.handleWeiboResponse(getIntent(), this);
@@ -155,6 +154,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWeiBoShareAPI = weiBoShareUtil.getMWeiBoShareAPI();
         weChatShareUtil = new WeChatShareUtil(mContext, MainActivity.this);
         util = new Util(mContext, MainActivity.this);
+        util.useGesture(R.id.gestureViewMain);
         wishTexts = getResources().getStringArray(R.array.WishTextItemArray);
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -277,6 +277,18 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
             }
         });
 
+        mHelp = (ImageView) findViewById(R.id.help);
+        mHelp.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MaterialDialog materialDialog = new MaterialDialog(mContext);
+                materialDialog.setTitle(getString(R.string.info))
+                        .setMessage(getString(R.string.gesture_instruction))
+                        .setCanceledOnTouchOutside(true)
+                        .show();
+            }
+        });
+
         mAbout = (ImageView) findViewById(R.id.about);
         mAbout.setOnClickListener(new OnClickListener() {
             @Override
@@ -299,6 +311,14 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                         }).show();
             }
         });
+    }
+
+    /**
+     * 必要的验证
+     */
+    private void verification() {
+        util.verifyVersion();//系统版本验证
+        Util.verifyStoragePermissions(MainActivity.this); //查询应用是否拥有读写存储权限，没有则询问用户是否授权
     }
 
     /**
@@ -448,6 +468,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWeChatShareTimeLine.setVisibility(visibility);
         mWeiBoShare.setVisibility(visibility);
         mTextLength.setVisibility(visibility);
+        mHelp.setVisibility(visibility);
         mAbout.setVisibility(visibility);
     }
 
@@ -603,7 +624,9 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      * 为微博分享做准备
      */
     private void prepareForWeiBoShare() {
-        weiBoShareUtil.weiBoAction(generateSpringCard(), true, true, false, false, false, false);
+        weiBoShareUtil.setWeiBoShareText(getString(R.string.wish_text));
+        weiBoShareUtil.setWeiBoShareImage(generateSpringCard());
+        weiBoShareUtil.weiBoAction(true, true, false, false, false, false);
         setVisibility(View.VISIBLE);
     }
 

@@ -3,7 +3,6 @@ package com.imooc.run.newyear.Util;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import com.imooc.run.newyear.R;
@@ -29,10 +28,16 @@ public class WeiBoShareUtil {
     private final Activity mActivity;
     private final Util util;
 
+    private final TextObject textObj;
+    private final ImageObject imageObj;
+
     public WeiBoShareUtil(Context context, Activity activity) {
         mContext = context;
         mActivity = activity;
         util = new Util(mContext, mActivity);
+
+        textObj = new TextObject();
+        imageObj = new ImageObject();
 
         mWeiBoShareAPI = WeiboShareSDK.createWeiboAPI(context, WeiBoConstants.APP_KEY); // 创建微博分享接口实例
         mWeiBoShareAPI.registerApp(); //注册第三方应用到微博客户端中，注册成功后该应用将显示在微博的应用列表中。
@@ -56,16 +61,16 @@ public class WeiBoShareUtil {
      *
      * @see {@link #sendMultiMessage} 或者 {@link #sendSingleMessage}
      */
-    private void sendMessage(Bitmap picture, boolean hasText, boolean hasImage,
+    private void sendMessage(boolean hasText, boolean hasImage,
                              boolean hasWebPage, boolean hasMusic, boolean hasVideo, boolean hasVoice) {
 
 
         if (mWeiBoShareAPI.isWeiboAppSupportAPI()) {
             int supportApi = mWeiBoShareAPI.getWeiboAppSupportAPI();
             if (supportApi >= 10351) {
-                sendMultiMessage(picture, hasText, hasImage, hasWebPage, hasMusic, hasVideo, hasVoice);
+                sendMultiMessage(hasText, hasImage, hasWebPage, hasMusic, hasVideo, hasVoice);
             } else {
-                sendSingleMessage(picture, hasText, hasImage, hasWebPage, hasMusic, hasVideo);
+                sendSingleMessage(hasText, hasImage, hasWebPage, hasMusic, hasVideo);
             }
         } else {
             util.showMessage(mContext.getString(R.string.weiBo_not_supported), Toast.LENGTH_SHORT);
@@ -77,7 +82,6 @@ public class WeiBoShareUtil {
      * 注意：当 {@link IWeiboShareAPI#getWeiboAppSupportAPI()} >= 10351 时，支持同时分享多条消息，
      * 同时可以分享文本、图片以及其它媒体资源（网页、音乐、视频、声音中的一种）。
      *
-     * @param picture    要分享的照片
      * @param hasText    分享的内容是否有文本
      * @param hasImage   分享的内容是否有图片
      * @param hasWebPage 分享的内容是否有网页
@@ -85,7 +89,7 @@ public class WeiBoShareUtil {
      * @param hasVideo   分享的内容是否有视频
      * @param hasVoice   分享的内容是否有声音
      */
-    private void sendMultiMessage(Bitmap picture, boolean hasText, boolean hasImage, boolean hasWebPage,
+    private void sendMultiMessage(boolean hasText, boolean hasImage, boolean hasWebPage,
                                   boolean hasMusic, boolean hasVideo, boolean hasVoice) {
         // 1. 初始化微博的分享消息
         WeiboMultiMessage weiBoMessage = new WeiboMultiMessage();
@@ -94,7 +98,7 @@ public class WeiBoShareUtil {
         }
 
         if (hasImage) {
-            weiBoMessage.imageObject = getImageObj(picture);
+            weiBoMessage.imageObject = getImageObj();
         }
 
         // 用户可以分享其它媒体资源（网页、音乐、视频、声音中的一种）
@@ -126,21 +130,20 @@ public class WeiBoShareUtil {
      * 当{@link IWeiboShareAPI#getWeiboAppSupportAPI()} < 10351 时，只支持分享单条消息，即
      * 文本、图片、网页、音乐、视频中的一种，不支持Voice消息。
      *
-     * @param picture    要分享的照片
      * @param hasText    分享的内容是否有文本
      * @param hasImage   分享的内容是否有图片
      * @param hasWebPage 分享的内容是否有网页
      * @param hasMusic   分享的内容是否有音乐
      * @param hasVideo   分享的内容是否有视频
      */
-    private void sendSingleMessage(Bitmap picture, boolean hasText, boolean hasImage, boolean hasWebPage,
+    private void sendSingleMessage(boolean hasText, boolean hasImage, boolean hasWebPage,
                                    boolean hasMusic, boolean hasVideo) {
         WeiboMessage weiboMessage = new WeiboMessage();
         if (hasText) {
             weiboMessage.mediaObject = getTextObj();
         }
         if (hasImage) {
-            weiboMessage.mediaObject = getImageObj(picture);
+            weiboMessage.mediaObject = getImageObj();
         }
         if (hasWebPage) {
             weiboMessage.mediaObject = new WebpageObject();
@@ -160,54 +163,54 @@ public class WeiBoShareUtil {
     }
 
     /**
-     * 获取分享的文本模板。
+     * 设置要分享的文本消息内容
      *
-     * @return 分享的文本模板
+     * @param text 要分享的文本消息内容
      */
-    @NonNull
-    private String getSharedText() {
-        return mContext.getString(R.string.wish_text);
+    public void setWeiBoShareText(String text) {
+        textObj.text = text;
     }
 
     /**
-     * 创建文本消息对象。
-     *
-     * @return 文本消息对象。
+     * 获得要分享的文本消息内容
      */
     private TextObject getTextObj() {
-        TextObject textObject = new TextObject();
-        textObject.text = getSharedText();
-        return textObject;
+        return textObj;
     }
 
     /**
-     * 创建图片消息对象。
+     * 设置要分享图片消息对象。
+     */
+    public void setWeiBoShareImage(Bitmap picture) {
+        imageObj.setImageObject(picture);
+    }
+
+    /**
+     * 获得要分享的图片消息对象。
      *
      * @return 图片消息对象。
      */
-    private ImageObject getImageObj(Bitmap picture) {
-        ImageObject imageObject = new ImageObject();
-        imageObject.setImageObject(picture);
-        return imageObject;
+    private ImageObject getImageObj() {
+        return imageObj;
     }
+
 
     /**
      * 处理微博分享动作
      *
-     * @param picture    要分享的照片
      * @param hasText    分享的内容是否有文本
      * @param hasImage   分享的内容是否有图片
      * @param hasWebPage 分享的内容是否有网页
      * @param hasMusic   分享的内容是否有音乐
      * @param hasVideo   分享的内容是否有视频
      */
-    public void weiBoAction(Bitmap picture, boolean hasText, boolean hasImage, boolean hasWebPage,
+    public void weiBoAction(boolean hasText, boolean hasImage, boolean hasWebPage,
                             boolean hasMusic, boolean hasVideo, boolean hasVoice) {
         try {
             if (!checkWBInstalled()) {
                 util.showMessage(mContext.getString(R.string.weiBo_not_installed), Toast.LENGTH_SHORT);
             } else {
-                sendMessage(picture, hasText, hasImage, hasWebPage, hasMusic, hasVideo, hasVoice);
+                sendMessage(hasText, hasImage, hasWebPage, hasMusic, hasVideo, hasVoice);
             }
         } catch (WeiboException e) {
             util.showErrorMsg(e);

@@ -4,16 +4,20 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.gesture.Gesture;
+import android.gesture.GestureLibraries;
+import android.gesture.GestureLibrary;
+import android.gesture.GestureOverlayView;
+import android.gesture.Prediction;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
-import android.os.Build;
-import android.os.Handler;
-import android.os.Vibrator;
+import android.os.*;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -24,12 +28,14 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.imooc.run.newyear.MainActivity;
 import com.imooc.run.newyear.R;
 import com.imooc.run.newyear.constants.Constants;
 
 import org.jetbrains.annotations.Contract;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Util {
@@ -341,6 +347,34 @@ public class Util {
             WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
             return wifiManager.isWifiEnabled();
         }
+    }
+
+    /**
+     * 使用手势识别
+     *
+     * @param resId GestureOverlayView的id
+     */
+    public void useGesture(int resId) {
+        GestureOverlayView v = (GestureOverlayView) activity.findViewById(resId);
+        final GestureLibrary library = GestureLibraries.fromRawResource(context, R.raw.gestures);
+        library.load();
+        v.addOnGesturePerformedListener(new GestureOverlayView.OnGesturePerformedListener() {
+            @Override
+            public void onGesturePerformed(GestureOverlayView overlay, Gesture gesture) {
+                ArrayList<Prediction> gestures = library.recognize(gesture);
+                Prediction prediction = gestures.get(0);
+                if (prediction.score >= 5.0) {
+                    if (prediction.name.equals("previous")) {
+                        Intent intent = new Intent(context, MainActivity.class);
+                        context.startActivity(intent);
+                    } else if (prediction.name.equals("wish")) {
+                        String[] wishes = context.getResources().getStringArray(R.array.WishTextItemArray);
+                        int wishId = getRandomNumber(wishes.length);
+                        showMessage(wishes[wishId], 1000);
+                    }
+                }
+            }
+        });
     }
 
 }

@@ -6,6 +6,12 @@
     android:background="@drawable/bg"
     tools:context="com.imooc.run.newyear.MainActivity">
 
+    <android.gesture.GestureOverlayView
+        android:id="@+id/gestureViewMain"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gestureColor="@android:color/transparent" />
+
     <ImageView
         android:id="@+id/photo"
         android:layout_width="250dp"
@@ -73,6 +79,16 @@
         android:layout_toEndOf="@+id/wechat_share_timeline"
         android:layout_toRightOf="@+id/wechat_share_timeline"
         android:background="@drawable/share_weibo" />
+
+    <ImageView
+        android:id="@+id/help"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/help" />
 
     <ImageView
         android:id="@+id/about"
