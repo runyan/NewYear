@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
@@ -108,11 +109,18 @@ public class PicSelectActivity extends Activity {
      * @param radioGroup 要添加长按监听器的RadioGroup
      */
     private void setOnLongClickListener(RadioGroup radioGroup) {
+        //获取屏幕显示宽度
+        DisplayMetrics metric = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metric);
+        int displayWidth = metric.widthPixels;//获取以像素为单位的屏幕宽度
+
         int radioButtonCount = radioGroup.getChildCount();
         for (int i = 0; i < radioButtonCount; i++) {
             View view = radioGroup.getChildAt(i);
             if (view instanceof RadioButton) {
-                view.setOnLongClickListener(new mLongClickWatcher());
+                RadioButton radioButton = (RadioButton) view;
+                radioButton.setWidth(displayWidth / 2 - 50);
+                radioButton.setOnLongClickListener(new mLongClickWatcher());
             }
         }
     }

@@ -256,7 +256,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWeChatShareTimeLine.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                weChatAction(0);
+                checkWifiAvailabilityForWeChatShare(0);
             }
         });
 
@@ -264,7 +264,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWeChatShareFriend.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                weChatAction(1);
+                checkWifiAvailabilityForWeChatShare(1);
             }
         });
 
@@ -272,7 +272,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWeiBoShare.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                weiBoAction();
+                checkWifiAvailabilityForWeiBoShare();
 
             }
         });
@@ -555,18 +555,18 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      */
 
     /**
-     * 处理微信分享动作
+     * 微信分享前检测是否使用wifi
      *
      * @param flag 分享位置 0为分享到朋友圈 1为分享给微信好友
      */
-    private void weChatAction(final int flag) {
+    private void checkWifiAvailabilityForWeChatShare(final int flag) {
         if (!util.checkWifiAvailability()) {
             final MaterialDialog materialDialog = new MaterialDialog(mContext);
             materialDialog.setMessage(getString(R.string.wifi_not_enabled))
                     .setPositiveButton(R.string.yes, new OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            prepareForWeChatShare(flag);
+                            weChatShare(flag);
                             materialDialog.dismiss();
                         }
                     })
@@ -578,16 +578,16 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                     })
                     .show();
         } else {
-            prepareForWeChatShare(flag);
+            weChatShare(flag);
         }
     }
 
     /**
-     * 为微信分享做准备
+     * 微信分享
      *
      * @param flag 分享位置 0为分享到朋友圈 1为分享给微信好友
      */
-    private void prepareForWeChatShare(int flag) {
+    private void weChatShare(int flag) {
         weChatShareUtil.weChatAction(flag, generateSpringCard());
         setVisibility(View.VISIBLE);
     }
@@ -598,16 +598,16 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      */
 
     /**
-     * 处理微博分享动作
+     * 微博分享前检测是否使用wifi
      */
-    private void weiBoAction() {
+    private void checkWifiAvailabilityForWeiBoShare() {
         if (!util.checkWifiAvailability()) {
             final MaterialDialog materialDialog = new MaterialDialog(mContext);
             materialDialog.setMessage(getString(R.string.wifi_not_enabled))
                     .setPositiveButton(R.string.yes, new OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            prepareForWeiBoShare();
+                            weiBoShare();
                             materialDialog.dismiss();
                         }
                     })
@@ -618,14 +618,14 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                         }
                     }).show();
         } else {
-            prepareForWeiBoShare();
+            weiBoShare();
         }
     }
 
     /**
-     * 为微博分享做准备
+     * 微博分享
      */
-    private void prepareForWeiBoShare() {
+    private void weiBoShare() {
         weiBoShareUtil.setWeiBoShareText(getString(R.string.wish_text));
         weiBoShareUtil.setWeiBoShareImage(generateSpringCard());
         weiBoShareUtil.weiBoAction(true, true, false, false, false, false);
