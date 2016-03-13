@@ -22,6 +22,7 @@ import android.os.*;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.telephony.TelephonyManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -355,6 +356,17 @@ public class Util {
     }
 
     /**
+     * 检查设备是否为手机，不是手机则退出
+     */
+    public void verifyDeviceType() {
+        TelephonyManager telephony = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        if (telephony.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE) {
+            showMessage(context.getString(R.string.device_not_supported), 1000);
+            exit();
+        }
+    }
+
+    /**
      * 使用手势识别
      *
      * @param resId GestureOverlayView的id
@@ -413,6 +425,21 @@ public class Util {
                 }
             }
         });
+    }
+
+    /**
+     * 获得应用版本
+     *
+     * @return 应用版本
+     */
+    public String getAppVersion() {
+        String version = "0";
+        try {
+            version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+        } catch (Exception e) {
+            showErrorMsg(e);
+        }
+        return version;
     }
 
 }

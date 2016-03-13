@@ -38,12 +38,14 @@
     <string name="selecting">正在选择</string>
     <string name="generating">生成中，请稍候</string>
     <string name="about">关于</string>
-    <string name="about_text">版本：1.4.3\nAll Rights Reserved</string>
+    <string name="version">版本：</string>
+    <string name="reserved_right">All Rights Reserved</string>
     <string name="you_can_enter">还能输入</string>
     <string name="words">个字</string>
     <string name="network_unavailable">网络不可用</string>
     <string name="wifi_not_enabled">检测到你正在使用移动网络,继续使用\n可能会产生流量费用\n是否继续？</string>
     <string name="gesture_instruction">在除启动页面的其他页面：\n画出“小于号”以返回主页面\n在主页面画出“w”以获得新年祝福</string>
     <string name="close">关闭</string>
+    <string name="device_not_supported">设备不受支持</string>
 
 </resources>

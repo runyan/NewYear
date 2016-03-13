@@ -26,7 +26,7 @@ public class SplashActivity extends Activity {
 
         initView();
 
-        util.verifyVersion();
+        verify();
     }
 
     /**
@@ -51,6 +51,14 @@ public class SplashActivity extends Activity {
         boolean hasWelcomeScreen = pref.getBoolean("showOnStartUp", true);
         proceedToMain(hasWelcomeScreen);
 
+    }
+
+    /**
+     * 验证
+     */
+    private void verify() {
+        util.verifyVersion();
+        util.verifyDeviceType();
     }
 
     /**

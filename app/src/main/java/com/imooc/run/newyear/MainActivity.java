@@ -296,7 +296,9 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                 final MediaPlayer player = MediaPlayer.create(mContext, R.raw.happynewyear);
                 player.start();
                 final MaterialDialog mMaterialDialog = new MaterialDialog(mContext);
-                mMaterialDialog.setTitle(getString(R.string.about)).setMessage(getString(R.string.about_text))
+                String appVersion = util.getAppVersion();
+                String aboutText = getString(R.string.version) + appVersion + "\n" + getString(R.string.reserved_right);
+                mMaterialDialog.setTitle(getString(R.string.about)).setMessage(aboutText)
                         .setNegativeButton(getString(R.string.confirm), new OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -320,6 +322,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      */
     private void verification() {
         util.verifyVersion();//系统版本验证
+        util.verifyDeviceType();//检查设备是否为手机
         Util.verifyStoragePermissions(MainActivity.this); //查询应用是否拥有读写存储权限，没有则询问用户是否授权
     }
 
