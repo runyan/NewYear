@@ -20,6 +20,12 @@ public class FeedbackActivity extends Activity {
     private EditText mEmail;
     private EditText mContent;
 
+    private final String developerEmail = "developerEmail@126.com";
+    private final String developerEmailPassword = "password";
+    private final String developerEmailHost = "smtp.126.com";
+    private final String developerEmailPort = "25";
+    private String userEmail;
+
     private String name;
     private String email;
     private String content;
@@ -51,6 +57,11 @@ public class FeedbackActivity extends Activity {
                     if (util.checkNetworkAvailability()) {
                         SendTask sTask = new SendTask();
                         sTask.execute();
+                        if (!"匿名".equals(email)) {
+                            userEmail = email;
+                            AutoReplyTask autoReplyTask = new AutoReplyTask();
+                            autoReplyTask.execute();
+                        }
                     } else {
                         util.showMessage(getString(R.string.network_unavailable), Toast.LENGTH_SHORT);
                     }
@@ -81,12 +92,12 @@ public class FeedbackActivity extends Activity {
         @Override
         protected String doInBackground(Integer... params) {
             String emailContent = "姓名：" + name + "\n" + "Email:" + email + "\n" + "反馈内容：" + content;
-            MailUtil mail = new MailUtil("email address@126.com", "email password");
-            String[] toArr = {"recepient1", "recepient2"};
-            mail.setHost("smtp.126.com");
-            mail.setPort("25");
+            String[] toArr = {"yanrun2007@gmail.com", developerEmail};
+            MailUtil mail = new MailUtil(developerEmail, developerEmailPassword);
+            mail.setHost(developerEmailHost);
+            mail.setPort(developerEmailPort);
             mail.setTo(toArr);
-            mail.setFrom("email address@126.com");
+            mail.setFrom(developerEmail);
             mail.setSubject("反馈");
             mail.setBody(emailContent);
             try {
@@ -131,6 +142,30 @@ public class FeedbackActivity extends Activity {
                 }
             }
             FeedbackActivity.this.finish();
+        }
+    }
+
+    private class AutoReplyTask extends AsyncTask<Integer, Integer, String> {
+
+        @Override
+        protected String doInBackground(Integer... params) {
+            String[] receiver = {userEmail};
+            MailUtil mail = new MailUtil(developerEmail, developerEmailPassword);
+            mail.setHost(developerEmailHost);
+            mail.setPort(developerEmailPort);
+            mail.setTo(receiver);
+            mail.setFrom(developerEmail);
+            mail.setSubject("反馈成功");
+            mail.setBody("感谢反馈\n此邮件为自动回复邮件请不要直接回复本邮件");
+            try {
+                if (mail.send()) {
+                    return "success";
+                } else {
+                    return "fail";
+                }
+            } catch (Exception e) {
+                return "exception";
+            }
         }
     }
 }
