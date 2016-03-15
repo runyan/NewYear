@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 def computeVersion() {
-    return "1.4.4";
+    return "1.5.1";
 }
 
 android {
@@ -12,7 +12,7 @@ android {
         applicationId "com.imooc.run.newyear"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 36
+        versionCode 38
         versionName computeVersion()
     }
     buildTypes {
@@ -24,7 +24,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.2.0'
     compile 'com.android.support:design:23.2.0'
@@ -33,4 +33,7 @@ dependencies {
     compile 'org.jetbrains:annotations:13.0'
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.4'
     compile 'me.drakeet.materialdialog:library:1.3.0'
+    compile files('libs/activation.jar')
+    compile files('libs/additionnal.jar')
+    compile files('libs/mail.jar')
 }
