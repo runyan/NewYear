@@ -150,12 +150,15 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      * 初始化显示界面
      */
     private void initViews() {
+        wishTexts = getResources().getStringArray(R.array.WishTextItemArray);
+
         weiBoShareUtil = new WeiBoShareUtil(mContext, MainActivity.this);
         mWeiBoShareAPI = weiBoShareUtil.getMWeiBoShareAPI();
+
         weChatShareUtil = new WeChatShareUtil(mContext, MainActivity.this);
+
         util = new Util(mContext, MainActivity.this);
         util.useGesture(R.id.gestureViewMain);
-        wishTexts = getResources().getStringArray(R.array.WishTextItemArray);
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -256,7 +259,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWeChatShareTimeLine.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                checkWifiAvailabilityForWeChatShare(0);
+                checkWifiAvailabilityAndShareForWeChat(0);
             }
         });
 
@@ -264,7 +267,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWeChatShareFriend.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                checkWifiAvailabilityForWeChatShare(1);
+                checkWifiAvailabilityAndShareForWeChat(1);
             }
         });
 
@@ -272,8 +275,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWeiBoShare.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                checkWifiAvailabilityForWeiBoShare();
-
+                checkWifiAvailabilityAndShareForWeiBo();
             }
         });
 
@@ -562,7 +564,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      *
      * @param flag 分享位置 0为分享到朋友圈 1为分享给微信好友
      */
-    private void checkWifiAvailabilityForWeChatShare(final int flag) {
+    private void checkWifiAvailabilityAndShareForWeChat(final int flag) {
         if (!util.checkWifiAvailability()) {
             final MaterialDialog materialDialog = new MaterialDialog(mContext);
             materialDialog.setMessage(getString(R.string.wifi_not_enabled))
@@ -603,7 +605,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
     /**
      * 微博分享前检测是否使用wifi
      */
-    private void checkWifiAvailabilityForWeiBoShare() {
+    private void checkWifiAvailabilityAndShareForWeiBo() {
         if (!util.checkWifiAvailability()) {
             final MaterialDialog materialDialog = new MaterialDialog(mContext);
             materialDialog.setMessage(getString(R.string.wifi_not_enabled))

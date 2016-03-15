@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <TextView
+        android:id="@+id/tv_feedback"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text="@string/send_feedback"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_feedback"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="25dp"
+        android:text="@string/name"
+        android:textSize="20sp" />
+
+    <EditText
+        android:id="@+id/feedback_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/tv_name"
+        android:layout_below="@+id/tv_feedback"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:layout_toEndOf="@+id/tv_name"
+        android:layout_toRightOf="@+id/tv_name"
+        android:hint="@string/name_hint"
+        android:singleLine="true"
+        android:maxLength="20" />
+
+    <TextView
+        android:id="@+id/tv_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_name"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="25dp"
+        android:text="@string/email"
+        android:textSize="20sp" />
+
+    <EditText
+        android:id="@+id/feedback_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/tv_email"
+        android:layout_below="@+id/tv_name"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:layout_toEndOf="@+id/tv_email"
+        android:layout_toRightOf="@+id/tv_email"
+        android:hint="@string/email_hint"
+        android:singleLine="true"
+        android:inputType="textWebEmailAddress" />
+
+    <TextView
+        android:id="@+id/tv_feedback_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_email"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="25dp"
+        android:text="@string/feedback"
+        android:textSize="20sp" />
+
+    <EditText
+        android:id="@+id/feedback_content"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@+id/tv_feedback_content"
+        android:inputType="textMultiLine"
+        android:hint="@string/feedback_hint"
+        android:gravity="start|top"
+        android:maxLength="200"
+        android:scrollbarAlwaysDrawVerticalTrack="true" />
+
+    <TextView
+        android:id="@+id/tv_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/feedback_content"
+        android:layout_marginTop="5dp"
+        android:text="@string/required"
+        android:textSize="20sp"/>
+
+    <LinearLayout
+        android:id="@+id/buttons"
+        style="?android:buttonBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_hint"
+        android:layout_marginTop="5dp">
+
+        <Button
+            android:id="@+id/send_feedback"
+            style="?android:buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_weight="1"
+            android:text="@string/confirm" />
+
+        <Button
+            android:id="@+id/cancel_feedback"
+            style="?android:buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_weight="1"
+            android:text="@string/cancel" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

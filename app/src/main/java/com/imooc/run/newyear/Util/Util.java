@@ -10,6 +10,7 @@ import android.gesture.Gesture;
 import android.gesture.GestureLibraries;
 import android.gesture.GestureLibrary;
 import android.gesture.GestureOverlayView;
+import android.gesture.GestureOverlayView.OnGesturePerformedListener;
 import android.gesture.Prediction;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
@@ -32,6 +33,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.imooc.run.newyear.FeedbackActivity;
 import com.imooc.run.newyear.MainActivity;
 import com.imooc.run.newyear.R;
 import com.imooc.run.newyear.constants.Constants;
@@ -325,20 +327,10 @@ public class Util {
      *
      * @return true 有可用的网络, false 没有可用的网络
      */
-    private boolean checkNetworkAvailability() {
+    public boolean checkNetworkAvailability() {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        if (null != networkInfo) {
-            if (networkInfo.isAvailable()) {
-                return true;
-            } else {
-                showMessage(context.getString(R.string.network_unavailable), Toast.LENGTH_SHORT);
-                return false;
-            }
-        } else {
-            showMessage(context.getString(R.string.error), Toast.LENGTH_SHORT);
-            return false;
-        }
+        return null != networkInfo && networkInfo.isAvailable();
     }
 
     /**
@@ -347,12 +339,8 @@ public class Util {
      * @return true wifi已连接， false wifi未连接
      */
     public boolean checkWifiAvailability() {
-        if (!checkNetworkAvailability()) {
-            return false;
-        } else {
-            WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-            return wifiManager.isWifiEnabled();
-        }
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        return checkNetworkAvailability() && wifiManager.isWifiEnabled();
     }
 
     /**
@@ -375,7 +363,7 @@ public class Util {
         final GestureOverlayView v = (GestureOverlayView) activity.findViewById(resId);
         final GestureLibrary library = GestureLibraries.fromRawResource(context, R.raw.gestures);
         library.load();
-        v.addOnGesturePerformedListener(new GestureOverlayView.OnGesturePerformedListener() {
+        v.addOnGesturePerformedListener(new OnGesturePerformedListener() {
             @Override
             public void onGesturePerformed(GestureOverlayView overlay, Gesture gesture) {
                 ArrayList<Prediction> predictions = library.recognize(gesture);
@@ -419,6 +407,10 @@ public class Util {
                                     popupWindow.showAtCenter(v);
                                 }
                                 break;
+                            }
+                            case "feedback": {
+                                Intent intent = new Intent(activity, FeedbackActivity.class);
+                                context.startActivity(intent);
                             }
                         }
                     }

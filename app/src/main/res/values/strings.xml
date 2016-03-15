@@ -44,8 +44,22 @@
     <string name="words">个字</string>
     <string name="network_unavailable">网络不可用</string>
     <string name="wifi_not_enabled">检测到你正在使用移动网络,继续使用\n可能会产生流量费用\n是否继续？</string>
-    <string name="gesture_instruction">在除启动页面的其他页面：\n画出“小于号”以返回主页面\n在主页面画出“w”以获得新年祝福</string>
+    <string name="gesture_instruction">在除启动页面的其他页面：\n画出“小于号”以返回主页面\n画出“e”以发送反馈\n在主页面画出“w”以获得新年祝福</string>
     <string name="close">关闭</string>
     <string name="device_not_supported">设备不受支持</string>
+    <string name="send_feedback">发送反馈</string>
+    <string name="name">姓名：</string>
+    <string name="name_hint">请输入姓名</string>
+    <string name="email">Email：</string>
+    <string name="email_hint">请输入Email</string>
+    <string name="feedback">反馈内容（*）：</string>
+    <string name="feedback_hint">吐槽、表扬、鼓励……想说啥就说啥！</string>
+    <string name="required">*为必填项</string>
+    <string name="enter_feedback">请输入反馈内容</string>
+    <string name="begin_send">开始发送</string>
+    <string name="feedback_success">反馈成功</string>
+    <string name="feedback_fail">反馈失败</string>
+    <string name="anonymous">匿名</string>
+    <string name="sending">正在发送</string>
 
 </resources>
