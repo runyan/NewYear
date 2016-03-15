@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -28,6 +29,7 @@ public class FeedbackActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        util.smoothSwitchScreen();
         setContentView(R.layout.activity_feedback);
 
         Button mFeedBack = (Button) findViewById(R.id.send_feedback);
@@ -40,13 +42,12 @@ public class FeedbackActivity extends Activity {
         mFeedBack.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (0 == Util.getTextLength(mContent)) {
+                name = TextUtils.isEmpty(mName.getText().toString()) ? getString(R.string.anonymous) : mName.getText().toString();
+                email = TextUtils.isEmpty(mEmail.getText().toString()) ? getString(R.string.anonymous) : mEmail.getText().toString();
+                content = mContent.getText().toString();
+                if (TextUtils.isEmpty(content)) {
                     util.showMessage(getString(R.string.enter_feedback), Toast.LENGTH_SHORT);
                 } else {
-                    name = 0 == Util.getTextLength(mName) ? getString(R.string.anonymous) : mName.getText().toString();
-                    email = 0 == Util.getTextLength(mEmail) ? getString(R.string.anonymous) : mEmail.getText().toString();
-                    content = mContent.getText().toString();
-
                     if (util.checkNetworkAvailability()) {
                         SendTask sTask = new SendTask();
                         sTask.execute();

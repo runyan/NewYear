@@ -20,6 +20,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -174,7 +175,8 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                     hasClicked = true;
                 }
                 hasShaken = false;
-                if (0 == Util.getTextLength(mWishText)) { //当输入框中没有文本时，弹出选择框
+
+                if (TextUtils.isEmpty(mWishText.getText().toString())) { //当输入框中没有文本时，弹出选择框
                     enterText(true);
                 }
             }
@@ -183,7 +185,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWishText.setOnLongClickListener(new View.OnLongClickListener() { //长按输入框清空文本
             @Override
             public boolean onLongClick(View v) {
-                if (0 != Util.getTextLength(mWishText)) { //如果输入框内有内容则可以重新选择祝福语
+                if (!TextUtils.isEmpty(mWishText.getText().toString())) { //如果输入框内有内容则可以重新选择祝福语
                     enterText(false);
                 }
                 return true;
@@ -414,7 +416,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
             int threshold = 18; //这里设置的一个阈值为18，经测试比较满足一般的摇晃，也可以自己按需定义修改
             if ((Math.abs(x) > threshold || Math.abs(y) > threshold
                     || Math.abs(z) > threshold) && !hasShaken) {
-                if (0 != Util.getTextLength(mWishText) && !hasShaken) {
+                if (!TextUtils.isEmpty(mWishText.getText().toString()) && !hasShaken) {
                     mWishText.setText("");
                     util.vibrate(Constants.VIBRATE_SINGLE);
                     hasShaken = true;

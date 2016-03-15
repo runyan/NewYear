@@ -35,8 +35,8 @@
         android:layout_toEndOf="@+id/tv_name"
         android:layout_toRightOf="@+id/tv_name"
         android:hint="@string/name_hint"
-        android:singleLine="true"
-        android:maxLength="20" />
+        android:maxLength="20"
+        android:singleLine="true" />
 
     <TextView
         android:id="@+id/tv_email"
@@ -60,8 +60,8 @@
         android:layout_toEndOf="@+id/tv_email"
         android:layout_toRightOf="@+id/tv_email"
         android:hint="@string/email_hint"
-        android:singleLine="true"
-        android:inputType="textWebEmailAddress" />
+        android:inputType="textEmailAddress"
+        android:singleLine="true" />
 
     <TextView
         android:id="@+id/tv_feedback_content"
@@ -79,9 +79,9 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_below="@+id/tv_feedback_content"
-        android:inputType="textMultiLine"
-        android:hint="@string/feedback_hint"
         android:gravity="start|top"
+        android:hint="@string/feedback_hint"
+        android:inputType="textMultiLine"
         android:maxLength="200"
         android:scrollbarAlwaysDrawVerticalTrack="true" />
 
@@ -89,12 +89,12 @@
         android:id="@+id/tv_hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:layout_below="@+id/feedback_content"
         android:layout_marginTop="5dp"
         android:text="@string/required"
-        android:textSize="20sp"/>
+        android:textSize="20sp" />
 
     <LinearLayout
         android:id="@+id/buttons"

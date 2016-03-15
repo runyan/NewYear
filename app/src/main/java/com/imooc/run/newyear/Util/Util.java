@@ -114,16 +114,6 @@ public class Util {
     }
 
     /**
-     * 返回指定TextView内的文本长度
-     *
-     * @param textView 指定的TextView
-     * @return 指定TextView内的文本长度
-     */
-    public static int getTextLength(TextView textView) {
-        return textView.getText().length();
-    }
-
-    /**
      * 实现手机震动
      *
      * @param mode 震动模式
