@@ -515,7 +515,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                     mMaterialDialog.setNegativeButton(R.string.no, new OnClickListener() {//如果不保存
                         @Override
                         public void onClick(View v) {
-                            if (!Util.deleteMedia(photoPath)) {
+                            if (!Util.deleteFile(photoPath)) {
                                 util.showMessage(getString(R.string.delete_fail), Toast.LENGTH_SHORT);
                                 mMaterialDialog.dismiss();
                             }

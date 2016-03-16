@@ -206,14 +206,14 @@ public class Util {
     }
 
     /**
-     * 删除媒体文件
+     * 删除文件
      *
-     * @param path 要删除的媒体文件路径
+     * @param path 要删除的文件路径
      * @return true 删除成功， false 删除失败
      */
-    public static boolean deleteMedia(String path) {
-        File media = new File(path);
-        return media.delete();
+    public static boolean deleteFile(String path) {
+        File file = new File(path);
+        return file.delete();
     }
 
     /**
@@ -274,32 +274,32 @@ public class Util {
      * @return 媒体文件的Uri
      */
     public Uri getOutputMediaFileUri(String mediaStoragePath, String mediaPath) {
-        return Uri.fromFile(getOutputMediaFile(mediaStoragePath, mediaPath));
+        return Uri.fromFile(getOutputFile(mediaStoragePath, mediaPath));
     }
 
     /**
-     * 获得要分享的媒体文件
+     * 获得要分享的文件
      *
-     * @param mediaStoragePath 文件夹位置
-     * @param mediaPath        文件位置
-     * @return 要分享的媒体文件
+     * @param fileStoragePath 文件夹位置
+     * @param filePath        文件位置
+     * @return 要分享的文件
      */
     @Nullable
-    private File getOutputMediaFile(String mediaStoragePath, String mediaPath) {
-        File mediaFile;
+    private File getOutputFile(String fileStoragePath, String filePath) {
+        File file;
         try {
-            File mediaStorageDir = new File(mediaStoragePath);
+            File mediaStorageDir = new File(fileStoragePath);
             if (!mediaStorageDir.exists()) {
                 if (!mediaStorageDir.mkdirs()) {
                     return null;
                 }
             }
-            mediaFile = new File(mediaPath);
+            file = new File(filePath);
         } catch (Exception e) {
             showErrorMsg(e);
             return null;
         }
-        return mediaFile;
+        return file;
     }
 
     /**
