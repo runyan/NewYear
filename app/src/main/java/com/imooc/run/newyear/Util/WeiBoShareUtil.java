@@ -213,7 +213,7 @@ public class WeiBoShareUtil {
                 sendMessage(hasText, hasImage, hasWebPage, hasMusic, hasVideo, hasVoice);
             }
         } catch (WeiboException e) {
-            util.showErrorMsg(e);
+            util.showExceptionMsg(e);
         }
     }
 }

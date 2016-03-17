@@ -2,7 +2,6 @@ package com.imooc.run.newyear;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,17 +18,22 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 import com.imooc.run.newyear.Util.Util;
 import com.imooc.run.newyear.Util.WeChatShareUtil;
 import com.imooc.run.newyear.Util.WeiBoShareUtil;
@@ -40,8 +44,6 @@ import com.sina.weibo.sdk.api.share.IWeiboShareAPI;
 import com.sina.weibo.sdk.constant.WBConstants;
 
 import java.io.FileInputStream;
-
-import me.drakeet.materialdialog.MaterialDialog;
 
 public class MainActivity extends Activity implements IWeiboHandler.Response {
 
@@ -175,13 +177,14 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                 }
                 hasShaken = false;
 
-                if (0 != mWishText.getText().length()) { //当输入框中没有文本时，弹出选择框
+                if (0 == mWishText.getText().toString().length()) { //当输入框中没有文本时，弹出选择框
+                    util.closeInputMethod(mWishText);
                     enterText(true);
                 }
             }
         });
 
-        mWishText.setOnLongClickListener(new View.OnLongClickListener() { //长按输入框清空文本
+        mWishText.setOnLongClickListener(new OnLongClickListener() { //长按输入框清空文本
             @Override
             public boolean onLongClick(View v) {
                 if (0 != mWishText.getText().length()) { //如果输入框内有内容则可以重新选择祝福语
@@ -199,13 +202,18 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mPhoto.setOnLongClickListener(new OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                final ProgressDialog progressDialog = ProgressDialog.show(mContext,
-                        getString(R.string.info), getString(R.string.generating));
+                MaterialDialog.Builder mBuilder = new MaterialDialog.Builder(mContext);
+                mBuilder.theme(Theme.LIGHT)
+                        .title(R.string.info)
+                        .content(R.string.generating)
+                        .progress(true, 0);
+                final MaterialDialog progress = mBuilder.build();
+                progress.show();
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        progressDialog.dismiss();
+                        progress.dismiss();
                         autoGenerate();
                     }
                 }, 3000);
@@ -217,42 +225,44 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
             @Override
             public void onClick(View v) {
                 util.showMessage(getString(R.string.long_press_hint2), Toast.LENGTH_SHORT);
-                AlertDialog.Builder builder = util.getAlertDialog();
-                builder.setItems(getResources().getStringArray(R.array.GalleryItemSelectionArray), new DialogInterface.OnClickListener() { //选择图片位置
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0: { //选择系统图库
-                                Intent intent = new Intent(Intent.ACTION_PICK, null);
-                                intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-                                startActivityForResult(intent, Constants.REQ_ALBUM);
-                                break;
-                            }
-                            case 1: {//选择相机
-                                if (util.hasCamera()) {
-                                    if (Util.checkStoragePermission(MainActivity.this)) {
-                                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                        Uri photoUri = util.getOutputMediaFileUri(photoDirPath, photoPath);
-                                        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
-                                        startActivityForResult(intent, Constants.REQ_CAMERA); //拍照并保存照片
-                                    } else {
-                                        util.showMessage(getString(R.string.need_permission), Toast.LENGTH_SHORT);
+                MaterialDialog.Builder mBuilder = new MaterialDialog.Builder(mContext);
+                mBuilder.theme(Theme.LIGHT)
+                        .items(R.array.GalleryItemSelectionArray)
+                        .itemsCallback(new MaterialDialog.ListCallback() {
+                            @Override
+                            public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                                switch (which) {
+                                    case 0: { //选择系统图库
+                                        Intent intent = new Intent(Intent.ACTION_PICK, null);
+                                        intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+                                        startActivityForResult(intent, Constants.REQ_ALBUM);
+                                        break;
                                     }
-                                } else {
-                                    util.showMessage(getString(R.string.camera_not_available), Toast.LENGTH_SHORT);
+                                    case 1: {//选择相机
+                                        if (util.hasCamera()) {
+                                            if (Util.checkStoragePermission(MainActivity.this)) {
+                                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                                Uri photoUri = util.getOutputMediaFileUri(photoDirPath, photoPath);
+                                                intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+                                                startActivityForResult(intent, Constants.REQ_CAMERA); //拍照并保存照片
+                                            } else {
+                                                util.showMessage(getString(R.string.need_permission), Toast.LENGTH_SHORT);
+                                            }
+                                        } else {
+                                            util.showMessage(getString(R.string.camera_not_available), Toast.LENGTH_SHORT);
+                                        }
+                                        break;
+                                    }
+                                    case 2: {//选择默认图片
+                                        Intent intent = new Intent(MainActivity.this, PicSelectActivity.class);
+                                        startActivityForResult(intent, Constants.REQ_DEFAULT);
+                                        overridePendingTransition(R.anim.zoom_in, R.anim.zoom_out); //设置切换动画
+                                        break;
+                                    }
                                 }
-                                break;
                             }
-                            case 2: {//选择默认图片
-                                Intent intent = new Intent(MainActivity.this, PicSelectActivity.class);
-                                startActivityForResult(intent, Constants.REQ_DEFAULT);
-                                overridePendingTransition(R.anim.zoom_in, R.anim.zoom_out); //设置切换动画
-                                break;
-                            }
-                        }
-                    }
-                });
-                builder.show();
+                        })
+                        .show();
             }
         });
 
@@ -284,10 +294,11 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mHelp.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                MaterialDialog materialDialog = new MaterialDialog(mContext);
-                materialDialog.setTitle(getString(R.string.info))
-                        .setMessage(getString(R.string.gesture_instruction))
-                        .setCanceledOnTouchOutside(true)
+                MaterialDialog.Builder mBuilder = new MaterialDialog.Builder(mContext);
+                mBuilder.theme(Theme.LIGHT)
+                        .title(R.string.info)
+                        .content(R.string.gesture_instruction)
+                        .cancelable(true)
                         .show();
             }
         });
@@ -296,26 +307,30 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mAbout.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                final MediaPlayer player = MediaPlayer.create(mContext, R.raw.happynewyear);
-                player.start();
-                final MaterialDialog mMaterialDialog = new MaterialDialog(mContext);
                 String appVersion = util.getAppVersion();
                 String aboutText = getString(R.string.version) + appVersion + "\n" + getString(R.string.reserved_right);
-                mMaterialDialog.setTitle(getString(R.string.about)).setMessage(aboutText)
-                        .setNegativeButton(getString(R.string.confirm), new OnClickListener() {
+                final MediaPlayer player = MediaPlayer.create(mContext, R.raw.happynewyear);
+                player.start();
+                MaterialDialog.Builder mBuilder = new MaterialDialog.Builder(mContext);
+                mBuilder.theme(Theme.LIGHT)
+                        .title(R.string.about)
+                        .content(aboutText)
+                        .negativeText(R.string.confirm)
+                        .onNegative(new MaterialDialog.SingleButtonCallback() {
                             @Override
-                            public void onClick(View v) {
-                                mMaterialDialog.dismiss();
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                dialog.dismiss();
                             }
                         })
-                        .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        .dismissListener(new DialogInterface.OnDismissListener() {
                             @Override
                             public void onDismiss(DialogInterface dialog) {
                                 if (player.isPlaying()) {
                                     player.stop();
                                 }
                             }
-                        }).show();
+                        })
+                        .show();
             }
         });
     }
@@ -388,6 +403,9 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                             }
                             case 1: { //选择输入祝福语
                                 if (flag) {
+                                    //关闭键盘
+                                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                    imm.showSoftInput(mWishText, InputMethodManager.SHOW_FORCED);
                                     //输入框获得焦点
                                     mWishText.setFocusable(true);
                                     mWishText.requestFocus();
@@ -503,36 +521,37 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                     Bitmap bitmap = BitmapFactory.decodeStream(fis); //从照片的输入流中将图片解码为Bitmap
                     mPhoto.setImageBitmap(bitmap); //设置显示图片
                     //询问是否将图片保存在图库
-                    final MaterialDialog mMaterialDialog = new MaterialDialog(mContext);
-                    mMaterialDialog.setMessage(R.string.save_photo);
-                    mMaterialDialog.setPositiveButton(R.string.yes, new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            util.showMessage(getString(R.string.save_hint), Toast.LENGTH_SHORT);
-                            mMaterialDialog.dismiss();
-                        }
-                    });
-                    mMaterialDialog.setNegativeButton(R.string.no, new OnClickListener() {//如果不保存
-                        @Override
-                        public void onClick(View v) {
-                            if (!Util.deleteFile(photoPath)) {
-                                util.showMessage(getString(R.string.delete_fail), Toast.LENGTH_SHORT);
-                                mMaterialDialog.dismiss();
-                            }
-                            mMaterialDialog.dismiss();
-                        }
-                    });
-                    mMaterialDialog.setCanceledOnTouchOutside(false);
-                    mMaterialDialog.show();
+                    MaterialDialog.Builder mBuilder = new MaterialDialog.Builder(mContext);
+                    mBuilder.theme(Theme.LIGHT)
+                            .content(R.string.save_photo)
+                            .positiveText(R.string.yes)
+                            .negativeText(R.string.no)
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    util.showMessage(getString(R.string.save_hint), Toast.LENGTH_SHORT);
+                                    dialog.dismiss();
+                                }
+                            })
+                            .onNegative(new MaterialDialog.SingleButtonCallback() {//如果不保存
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    if (!Util.deleteFile(photoPath)) {
+                                        util.showMessage(getString(R.string.delete_fail), Toast.LENGTH_SHORT);
+                                    }
+                                    dialog.dismiss();
+                                }
+                            })
+                            .show();
                 } catch (Exception e) {
-                    util.showErrorMsg(e);
+                    util.showExceptionMsg(e);
                 } finally {
                     try {
                         if (null != fis) {
                             fis.close();
                         }
                     } catch (Exception e) {
-                        util.showErrorMsg(e);
+                        util.showExceptionMsg(e);
                     }
                 }
             }
@@ -567,19 +586,22 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      */
     private void checkWifiAvailabilityAndShareForWeChat(final int flag) {
         if (!util.checkWifiAvailability()) {
-            final MaterialDialog materialDialog = new MaterialDialog(mContext);
-            materialDialog.setMessage(getString(R.string.wifi_not_enabled))
-                    .setPositiveButton(R.string.yes, new OnClickListener() {
+            MaterialDialog.Builder mBuilder = new MaterialDialog.Builder(mContext);
+            mBuilder.theme(Theme.LIGHT)
+                    .content(R.string.wifi_not_enabled)
+                    .positiveText(R.string.yes)
+                    .negativeText(R.string.no)
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
                         @Override
-                        public void onClick(View v) {
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                             weChatShare(flag);
-                            materialDialog.dismiss();
+                            dialog.dismiss();
                         }
                     })
-                    .setNegativeButton(R.string.no, new OnClickListener() {
+                    .onNegative(new MaterialDialog.SingleButtonCallback() {
                         @Override
-                        public void onClick(View v) {
-                            materialDialog.dismiss();
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            dialog.dismiss();
                         }
                     })
                     .show();
@@ -608,21 +630,25 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
      */
     private void checkWifiAvailabilityAndShareForWeiBo() {
         if (!util.checkWifiAvailability()) {
-            final MaterialDialog materialDialog = new MaterialDialog(mContext);
-            materialDialog.setMessage(getString(R.string.wifi_not_enabled))
-                    .setPositiveButton(R.string.yes, new OnClickListener() {
+            MaterialDialog.Builder mBuilder = new MaterialDialog.Builder(mContext);
+            mBuilder.theme(Theme.LIGHT)
+                    .content(R.string.wifi_not_enabled)
+                    .positiveText(R.string.yes)
+                    .negativeText(R.string.no)
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
                         @Override
-                        public void onClick(View v) {
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                             weiBoShare();
-                            materialDialog.dismiss();
+                            dialog.dismiss();
                         }
                     })
-                    .setNegativeButton(R.string.no, new OnClickListener() {
+                    .onNegative(new MaterialDialog.SingleButtonCallback() {
                         @Override
-                        public void onClick(View v) {
-                            materialDialog.dismiss();
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            dialog.dismiss();
                         }
-                    }).show();
+                    })
+                    .show();
         } else {
             weiBoShare();
         }

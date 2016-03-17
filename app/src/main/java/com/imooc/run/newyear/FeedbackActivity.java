@@ -17,7 +17,7 @@ public class FeedbackActivity extends Activity {
     private EditText mEmail;
     private EditText mContent;
 
-    private final String developerEmail = "developerEmail@126.com";
+    private final String developerEmail = "developer@126.com";
     private final String developerEmailPassword = "password";
     private final String developerEmailHost = "smtp.126.com";
     private final String developerEmailPort = "25";
@@ -53,7 +53,7 @@ public class FeedbackActivity extends Activity {
                     if (util.checkNetworkAvailability()) {
                         String emailContent = "姓名：" + name + "\n" + "Email:" + email + "\n" + "反馈内容：" + content;
                         String[] toArr = {developerEmail};
-                        MailTask feedbackTask = new MailTask(FeedbackActivity.this, FeedbackActivity.this, true, true);
+                        MailTask feedbackTask = new MailTask(FeedbackActivity.this, FeedbackActivity.this);
                         feedbackTask.setSender(developerEmail);
                         feedbackTask.setPassword(developerEmailPassword);
                         feedbackTask.setReceivers(toArr);
@@ -61,9 +61,11 @@ public class FeedbackActivity extends Activity {
                         feedbackTask.setPort(developerEmailPort);
                         feedbackTask.setSubject("反馈");
                         feedbackTask.setBody(emailContent);
+                        feedbackTask.setNeedToShowResult(true);
+                        feedbackTask.setNeedProgressBar(true);
                         feedbackTask.execute();
                         if (!"匿名".equals(email)) {
-                            MailTask autoReplyTask = new MailTask(FeedbackActivity.this, FeedbackActivity.this, false, false);
+                            MailTask autoReplyTask = new MailTask(FeedbackActivity.this, FeedbackActivity.this);
                             String[] receivers = {email};
                             autoReplyTask.setSender(developerEmail);
                             autoReplyTask.setPassword(developerEmailPassword);

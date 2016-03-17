@@ -221,7 +221,7 @@ public class Util {
      *
      * @param throwable 程序抛出的异常
      */
-    public void showErrorMsg(Throwable throwable) {
+    public void showExceptionMsg(Throwable throwable) {
         String errMsg = context.getString(R.string.error) + ":" + throwable.getMessage();
         showMessage(errMsg, Toast.LENGTH_SHORT);
         throwable.printStackTrace();
@@ -296,7 +296,7 @@ public class Util {
             }
             file = new File(filePath);
         } catch (Exception e) {
-            showErrorMsg(e);
+            showExceptionMsg(e);
             return null;
         }
         return file;
@@ -339,7 +339,7 @@ public class Util {
     public void verifyDeviceType() {
         TelephonyManager telephony = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         if (telephony.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE) {
-            showMessage(context.getString(R.string.device_not_supported), 1000);
+            showMessage(context.getString(R.string.device_not_supported), Toast.LENGTH_SHORT);
             exit();
         }
     }
@@ -419,7 +419,7 @@ public class Util {
         try {
             version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
         } catch (Exception e) {
-            showErrorMsg(e);
+            showExceptionMsg(e);
         }
         return version;
     }

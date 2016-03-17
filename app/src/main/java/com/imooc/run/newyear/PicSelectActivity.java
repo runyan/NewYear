@@ -1,7 +1,6 @@
 package com.imooc.run.newyear;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,6 +17,8 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 import com.imooc.run.newyear.Util.PopupWindowUtil;
 import com.imooc.run.newyear.Util.Util;
 import com.imooc.run.newyear.constants.Constants;
@@ -86,13 +87,18 @@ public class PicSelectActivity extends Activity {
         mRandomSelect.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                final ProgressDialog progressDialog = ProgressDialog.show(mContext,
-                        getString(R.string.info), getString(R.string.selecting));
+                MaterialDialog.Builder mBuilder = new MaterialDialog.Builder(mContext);
+                mBuilder.theme(Theme.LIGHT)
+                        .title(R.string.info)
+                        .content(R.string.selecting)
+                        .progress(true, 0);
+                final MaterialDialog progress = mBuilder.build();
+                progress.show();
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        progressDialog.dismiss();
+                        progress.dismiss();
                         int random = util.getRandomNumber(mPics.getChildCount());
                         ((RadioButton) mPics.getChildAt(random)).setChecked(true);
                     }

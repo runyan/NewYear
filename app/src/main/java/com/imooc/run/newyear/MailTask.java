@@ -1,11 +1,12 @@
 package com.imooc.run.newyear;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 import com.imooc.run.newyear.Util.MailUtil;
 import com.imooc.run.newyear.Util.Util;
 
@@ -25,12 +26,20 @@ public class MailTask extends AsyncTask<Integer, Integer, String> {
     private Activity activity;
     private Context context;
 
-    private ProgressDialog progress;
+    private MaterialDialog progress;
 
-    public MailTask(Context context, Activity activity, boolean needProgressBar, boolean needToShowResult) {
+    public MailTask(Context context, Activity activity) {
+        this.needProgressBar = false;
+        this.needToShowResult = false;
         this.activity = activity;
         this.context = context;
+    }
+
+    public void setNeedProgressBar(boolean needProgressBar) {
         this.needProgressBar = needProgressBar;
+    }
+
+    public void setNeedToShowResult(boolean needToShowResult) {
         this.needToShowResult = needToShowResult;
     }
 
@@ -62,11 +71,24 @@ public class MailTask extends AsyncTask<Integer, Integer, String> {
         this.body = body;
     }
 
+    public boolean getNeedToShowResult() {
+        return this.needToShowResult;
+    }
+
+    public boolean getNeedProgressBar() {
+        return this.needProgressBar;
+    }
+
     @Override
     protected void onPreExecute() {
-        if (needProgressBar) {
-            progress = ProgressDialog.show(context, context.getString(R.string.info), context.getString(R.string.sending));
-            progress.setCancelable(false);
+        if (this.getNeedProgressBar()) {
+            MaterialDialog.Builder mBuilder = new MaterialDialog.Builder(context);
+            mBuilder.theme(Theme.LIGHT)
+                    .title(R.string.info)
+                    .content(R.string.sending)
+                    .progress(true, 0);
+            progress = mBuilder.build();
+            progress.show();
         }
         super.onPreExecute();
     }
@@ -108,9 +130,9 @@ public class MailTask extends AsyncTask<Integer, Integer, String> {
          */
         super.onPostExecute(r);
         Util util = new Util(context, activity);
-        if (needProgressBar)
+        if (this.getNeedProgressBar())
             progress.dismiss();
-        if (needToShowResult) {
+        if (this.getNeedToShowResult()) {
             switch (r) {
                 case "success": {
                     util.showMessage(context.getString(R.string.feedback_success), Toast.LENGTH_SHORT);
