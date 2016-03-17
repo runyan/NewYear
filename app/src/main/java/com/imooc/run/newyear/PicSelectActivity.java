@@ -91,7 +91,8 @@ public class PicSelectActivity extends Activity {
                 mBuilder.theme(Theme.LIGHT)
                         .title(R.string.info)
                         .content(R.string.selecting)
-                        .progress(true, 0);
+                        .progress(true, 0)
+                        .cancelable(false);
                 final MaterialDialog progress = mBuilder.build();
                 progress.show();
                 Handler handler = new Handler();

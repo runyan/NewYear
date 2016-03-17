@@ -206,6 +206,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                 mBuilder.theme(Theme.LIGHT)
                         .title(R.string.info)
                         .content(R.string.generating)
+                        .cancelable(false)
                         .progress(true, 0);
                 final MaterialDialog progress = mBuilder.build();
                 progress.show();
@@ -316,6 +317,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                         .title(R.string.about)
                         .content(aboutText)
                         .negativeText(R.string.confirm)
+                        .cancelable(false)
                         .onNegative(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
@@ -390,6 +392,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                                 //默认祝福语选择对话框
                                 AlertDialog.Builder selector = util.getAlertDialog();
                                 selector.setTitle(getString(R.string.wish_text_selection))
+                                        .setCancelable(false)
                                         .setSingleChoiceItems(wishTexts, 0, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
@@ -542,6 +545,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                                     dialog.dismiss();
                                 }
                             })
+                            .cancelable(false)
                             .show();
                 } catch (Exception e) {
                     util.showExceptionMsg(e);
@@ -604,6 +608,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                             dialog.dismiss();
                         }
                     })
+                    .cancelable(false)
                     .show();
         } else {
             weChatShare(flag);
@@ -648,6 +653,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                             dialog.dismiss();
                         }
                     })
+                    .cancelable(false)
                     .show();
         } else {
             weiBoShare();

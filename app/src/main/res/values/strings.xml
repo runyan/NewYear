@@ -43,7 +43,7 @@
     <string name="you_can_enter">还能输入</string>
     <string name="words">个字</string>
     <string name="network_unavailable">网络不可用</string>
-    <string name="wifi_not_enabled">检测到你正在使用移动网络,继续使用\n可能会产生流量费用\n是否继续？</string>
+    <string name="wifi_not_enabled">检测到你正在使用移动网络,\n继续使用可能会产生流量费用\n是否继续？</string>
     <string name="gesture_instruction">在除启动页面的其他页面：\n画出“小于号”以返回主页面\n画出“e”以发送反馈\n在主页面画出“w”以获得新年祝福</string>
     <string name="close">关闭</string>
     <string name="device_not_supported">设备不受支持</string>
@@ -61,5 +61,9 @@
     <string name="feedback_fail">反馈失败</string>
     <string name="anonymous">匿名</string>
     <string name="sending">正在发送</string>
+    <string name="auto_reply_subject">反馈成功</string>
+    <string name="auto_reply_content">感谢反馈\n此邮件为自动回复邮件请不要直接回复本邮件</string>
+    <string name="feedback_subject">反馈</string>
+    <string name="feedback_content">反馈内容</string>
 
 </resources>

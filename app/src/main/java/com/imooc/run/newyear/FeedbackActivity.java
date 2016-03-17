@@ -51,7 +51,8 @@ public class FeedbackActivity extends Activity {
                     util.showMessage(getString(R.string.enter_feedback), Toast.LENGTH_SHORT);
                 } else {
                     if (util.checkNetworkAvailability()) {
-                        String emailContent = "姓名：" + name + "\n" + "Email:" + email + "\n" + "反馈内容：" + content;
+                        String emailContent = getString(R.string.name) + name + "\n" + getString(R.string.email) + email
+                                + "\n" + getString(R.string.feedback_content) + content;
                         String[] toArr = {developerEmail};
                         MailTask feedbackTask = new MailTask(FeedbackActivity.this, FeedbackActivity.this);
                         feedbackTask.setSender(developerEmail);
@@ -59,12 +60,12 @@ public class FeedbackActivity extends Activity {
                         feedbackTask.setReceivers(toArr);
                         feedbackTask.setHost(developerEmailHost);
                         feedbackTask.setPort(developerEmailPort);
-                        feedbackTask.setSubject("反馈");
+                        feedbackTask.setSubject(getString(R.string.feedback_subject));
                         feedbackTask.setBody(emailContent);
                         feedbackTask.setNeedToShowResult(true);
                         feedbackTask.setNeedProgressBar(true);
                         feedbackTask.execute();
-                        if (!"匿名".equals(email)) {
+                        if (!getString(R.string.anonymous).equals(email)) {
                             MailTask autoReplyTask = new MailTask(FeedbackActivity.this, FeedbackActivity.this);
                             String[] receivers = {email};
                             autoReplyTask.setSender(developerEmail);
@@ -72,8 +73,8 @@ public class FeedbackActivity extends Activity {
                             autoReplyTask.setReceivers(receivers);
                             autoReplyTask.setHost(developerEmailHost);
                             autoReplyTask.setPort(developerEmailPort);
-                            autoReplyTask.setSubject("反馈成功");
-                            autoReplyTask.setBody("感谢反馈\n此邮件为自动回复邮件请不要直接回复本邮件");
+                            autoReplyTask.setSubject(getString(R.string.auto_reply_subject));
+                            autoReplyTask.setBody(getString(R.string.auto_reply_content));
                             autoReplyTask.execute();
                         }
                     } else {

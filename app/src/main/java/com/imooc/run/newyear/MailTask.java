@@ -86,7 +86,8 @@ public class MailTask extends AsyncTask<Integer, Integer, String> {
             mBuilder.theme(Theme.LIGHT)
                     .title(R.string.info)
                     .content(R.string.sending)
-                    .progress(true, 0);
+                    .progress(true, 0)
+                    .cancelable(false);
             progress = mBuilder.build();
             progress.show();
         }
