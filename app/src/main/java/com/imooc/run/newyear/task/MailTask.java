@@ -1,4 +1,4 @@
-package com.imooc.run.newyear;
+package com.imooc.run.newyear.task;
 
 import android.app.Activity;
 import android.content.Context;
@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
+import com.imooc.run.newyear.R;
 import com.imooc.run.newyear.Util.MailUtil;
 import com.imooc.run.newyear.Util.Util;
 

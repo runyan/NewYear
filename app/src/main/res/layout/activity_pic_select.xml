@@ -24,7 +24,7 @@
                 android:textSize="25sp"
                 android:textStyle="bold" />
 
-            <com.imooc.run.newyear.FlowRadioGroup
+            <com.imooc.run.newyear.customView.FlowRadioGroup
                 android:id="@+id/pics"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -84,7 +84,7 @@
                     android:layout_marginTop="10dp"
                     android:drawableTop="@drawable/pic6" />
 
-            </com.imooc.run.newyear.FlowRadioGroup>
+            </com.imooc.run.newyear.customView.FlowRadioGroup>
 
             <LinearLayout
                 android:id="@+id/buttons"

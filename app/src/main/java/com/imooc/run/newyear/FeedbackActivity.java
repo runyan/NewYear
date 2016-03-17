@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.imooc.run.newyear.Util.Util;
+import com.imooc.run.newyear.task.MailTask;
 
 public class FeedbackActivity extends Activity {
 
