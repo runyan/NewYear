@@ -1,8 +1,4 @@
 ##制作贺年卡并分享给微信好友，微信朋友圈以及新浪微博
-###
-    安卓APP 使用Android Studio开发
-    基于慕课网 Android-心愿分享课程 http://www.imooc.com/learn/592
-    [Android-心愿分享课程](http://www.imooc.com/learn/592 "123")
 ###简介
 安卓APP 使用Android Studio开发<br/>
 基于慕课网
