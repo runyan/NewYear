@@ -51,6 +51,8 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
 
     private ImageView mPhoto;
 
+    private SlidingMenu slidingMenu;
+
     private Button mWeChatShareTimeLine;
     private Button mWeChatShareFriend;
     private Button mWeiBoShare;
@@ -113,11 +115,16 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
 
     @Override
     public void onBackPressed() {
-        //当APP没有被kill时只显示1次启动界面
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        startActivity(intent);
+        if(slidingMenu.isMenuShowing()) {
+            slidingMenu.showContent();
+        } else {
+            //当APP没有被kill时只显示1次启动界面
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            startActivity(intent);
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -291,16 +298,17 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
             }
         });
 
-        SlidingMenu slidingMenu;
         slidingMenu = new SlidingMenu(this);
-        slidingMenu.setMode(SlidingMenu.LEFT);  //菜单从左边滑出
+        slidingMenu.setMode(SlidingMenu.LEFT);//菜单从左边滑出
         int displayWidth = util.getDisplayWidth();
         int menuWidth = displayWidth / 2;
-        slidingMenu.setBehindWidth(menuWidth);        //菜单的宽度
+        slidingMenu.setBehindWidth(menuWidth);//菜单的宽度
         slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);//菜单全屏都可滑出
         slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
         slidingMenu.setFocusable(true);
         slidingMenu.setMenu(R.layout.menu_layout);
+        slidingMenu.setFadeEnabled(true);
+        slidingMenu.setFadeDegree(0.35f);
 
         TextView mHelp, mAbout, mFeedback;
 
@@ -308,6 +316,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mHelp.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideSlidingMenu();
                 MaterialDialog.Builder mBuilder = new MaterialDialog.Builder(mContext);
                 mBuilder.theme(Theme.LIGHT)
                         .title(R.string.info)
@@ -321,6 +330,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mAbout.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideSlidingMenu();
                 String appVersion = util.getAppVersion();
                 String aboutText = getString(R.string.version) + appVersion + "\n" + getString(R.string.reserved_right);
                 final MediaPlayer player = MediaPlayer.create(mContext, R.raw.happynewyear);
@@ -353,6 +363,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mFeedback.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideSlidingMenu();
                 Intent intent = new Intent(mContext, FeedbackActivity.class);
                 startActivity(intent);
             }
@@ -366,6 +377,15 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         util.verifyVersion();//系统版本验证
         util.verifyDeviceType();//检查设备是否为手机
         Util.verifyStoragePermissions(MainActivity.this); //查询应用是否拥有读写存储权限，没有则询问用户是否授权
+    }
+
+    /**
+     * 隐藏侧滑菜单
+     */
+    private void hideSlidingMenu() {
+        if (slidingMenu.isMenuShowing()) {
+            slidingMenu.showContent();
+        }
     }
 
     /**
