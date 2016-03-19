@@ -9,7 +9,8 @@
 [微信分享SDK](https://open.weixin.qq.com "微信分享SDK")<br/>
      开源组件：<br/>
 [android-gif-drawable](https://github.com/koral--/android-gif-drawable "android-gif-drawable")<br/>
-[material_dialogs](https://github.com/afollestad/material-dialogs "material_dialogs")
+[material_dialogs](https://github.com/afollestad/material-dialogs "material_dialogs")<br />
+[SlidingMenu](https://github.com/jfeinstein10/SlidingMenu "SlidingMenu")
 ###***注意：***
 * 使用分享SDK前需要去网站注册成为开发者，获得app_id，app_key后才可以使用分享功能。
 * 由于使用分享功能需要应用签名，在测试时可能无法使用分享功能，打包生成signed apk后可正常使用
