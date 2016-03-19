@@ -84,26 +84,6 @@
                 android:layout_toRightOf="@+id/wechat_share_timeline"
                 android:background="@drawable/share_weibo" />
 
-            <ImageView
-                android:id="@+id/help"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:contentDescription="@string/app_name"
-                android:src="@drawable/help" />
-
-            <ImageView
-                android:id="@+id/about"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:contentDescription="@string/app_name"
-                android:src="@drawable/about" />
-
         </RelativeLayout>
 
     </android.gesture.GestureOverlayView>

@@ -25,7 +25,6 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.activity_splash);
 
         initView();
-
         verify();
     }
 
@@ -52,6 +51,7 @@ public class SplashActivity extends Activity {
         proceedToMain(hasWelcomeScreen);
 
     }
+
 
     /**
      * 验证

@@ -16,6 +16,7 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        maven { url "http://jzaccone.github.io/SlidingMenu-aar" }
         mavenCentral()
         maven { url "https://jitpack.io" }
     }

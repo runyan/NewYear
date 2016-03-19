@@ -34,10 +34,12 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
+
 import com.imooc.run.newyear.Util.Util;
 import com.imooc.run.newyear.Util.WeChatShareUtil;
 import com.imooc.run.newyear.Util.WeiBoShareUtil;
 import com.imooc.run.newyear.constants.Constants;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.sina.weibo.sdk.api.share.BaseResponse;
 import com.sina.weibo.sdk.api.share.IWeiboHandler;
 import com.sina.weibo.sdk.api.share.IWeiboShareAPI;
@@ -48,8 +50,6 @@ import java.io.FileInputStream;
 public class MainActivity extends Activity implements IWeiboHandler.Response {
 
     private ImageView mPhoto;
-    private ImageView mAbout;
-    private ImageView mHelp;
 
     private Button mWeChatShareTimeLine;
     private Button mWeChatShareFriend;
@@ -291,7 +291,20 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
             }
         });
 
-        mHelp = (ImageView) findViewById(R.id.help);
+        SlidingMenu slidingMenu;
+        slidingMenu = new SlidingMenu(this);
+        slidingMenu.setMode(SlidingMenu.LEFT);  //菜单从左边滑出
+        int displayWidth = util.getDisplayWidth();
+        int menuWidth = displayWidth / 2;
+        slidingMenu.setBehindWidth(menuWidth);        //菜单的宽度
+        slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);//菜单全屏都可滑出
+        slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
+        slidingMenu.setFocusable(true);
+        slidingMenu.setMenu(R.layout.menu_layout);
+
+        TextView mHelp, mAbout, mFeedback;
+
+        mHelp = (TextView) findViewById(R.id.help);
         mHelp.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -304,7 +317,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
             }
         });
 
-        mAbout = (ImageView) findViewById(R.id.about);
+        mAbout = (TextView) findViewById(R.id.about);
         mAbout.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -333,6 +346,15 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                             }
                         })
                         .show();
+            }
+        });
+
+        mFeedback = (TextView) findViewById(R.id.feedback);
+        mFeedback.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, FeedbackActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -497,8 +519,6 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWeChatShareTimeLine.setVisibility(visibility);
         mWeiBoShare.setVisibility(visibility);
         mTextLength.setVisibility(visibility);
-        mHelp.setVisibility(visibility);
-        mAbout.setVisibility(visibility);
     }
 
     /**

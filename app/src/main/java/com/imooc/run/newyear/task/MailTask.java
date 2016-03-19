@@ -142,6 +142,7 @@ public class MailTask extends AsyncTask<Integer, Integer, String> {
                 }
                 case "fail": {
                     util.showMessage(context.getString(R.string.feedback_fail), Toast.LENGTH_SHORT);
+					break;
                 }
                 case "exception": {
                     util.showMessage(context.getString(R.string.error), Toast.LENGTH_SHORT);

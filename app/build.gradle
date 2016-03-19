@@ -37,4 +37,5 @@ dependencies {
     compile files('libs/activation.jar')
     compile files('libs/additionnal.jar')
     compile files('libs/mail.jar')
+    compile 'com.jeremyfeinstein.slidingmenu:library:1.3@aar'
 }

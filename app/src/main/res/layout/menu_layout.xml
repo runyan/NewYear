@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <com.jeremyfeinstein.slidingmenu.lib.SlidingMenu
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/menu_title"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_centerHorizontal="true"
+            android:text="@string/app_name"
+            android:textSize="50sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:gravity="center_horizontal"/>
+
+        <TextView
+            android:id="@+id/help"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_below="@+id/menu_title"
+            android:layout_marginTop="40dp"
+            android:text="@string/gesture_instruction_title"
+            android:textSize="20sp"
+            android:textColor="@color/blue"
+            android:gravity="center_horizontal"/>
+
+        <TextView
+            android:id="@+id/feedback"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_below="@+id/help"
+            android:layout_marginTop="10dp"
+            android:text="@string/send_feedback"
+            android:textSize="20sp"
+            android:textColor="@color/blue"
+            android:gravity="center_horizontal"/>
+
+        <TextView
+            android:id="@+id/about"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:text="@string/about"
+            android:textSize="20sp"
+            android:textColor="@color/blue"
+            android:gravity="center_horizontal"/>
+
+    </com.jeremyfeinstein.slidingmenu.lib.SlidingMenu>
+
+</RelativeLayout>

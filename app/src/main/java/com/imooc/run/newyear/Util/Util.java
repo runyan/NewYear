@@ -24,6 +24,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -33,7 +34,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.imooc.run.newyear.FeedbackActivity;
 import com.imooc.run.newyear.MainActivity;
 import com.imooc.run.newyear.R;
 import com.imooc.run.newyear.constants.Constants;
@@ -398,10 +398,6 @@ public class Util {
                                 }
                                 break;
                             }
-                            case "feedback": {
-                                Intent intent = new Intent(activity, FeedbackActivity.class);
-                                context.startActivity(intent);
-                            }
                         }
                     }
                 }
@@ -422,6 +418,17 @@ public class Util {
             showExceptionMsg(e);
         }
         return version;
+    }
+
+    /**
+     * 获取屏幕的宽度，以像素为单位
+     *
+     * @return 屏幕的显示宽度
+     */
+    public int getDisplayWidth() {
+        DisplayMetrics metric = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(metric);
+        return metric.widthPixels;
     }
 
 }
