@@ -49,27 +49,7 @@ import java.io.FileInputStream;
 
 public class MainActivity extends Activity implements IWeiboHandler.Response {
 
-    private ImageView mPhoto;
-
-    private SlidingMenu slidingMenu;
-
-    private Button mWeChatShareTimeLine;
-    private Button mWeChatShareFriend;
-    private Button mWeiBoShare;
-
-    private EditText mWishText;
-    private TextView mTextLength;
-
-    private IWeiboShareAPI mWeiBoShareAPI;//微博微博分享接口实例
-    private WeiBoShareUtil weiBoShareUtil;
-    private WeChatShareUtil weChatShareUtil;
-
     private final Context mContext = MainActivity.this;
-
-    private boolean hasClicked = false;
-
-    private Sensor mSensor;
-    private SensorManager mSensorManager;
 
     private final String photoDirPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
             + "/Camera"; //相机拍照后图片的保存位置
@@ -77,11 +57,35 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
 
     private final int maxTextLength = 10; //可以输入的最大文本长度
 
+    private final String SHARE_TYPE_WECHAT = "weChat";
+    private final String SHARE_TYPE_WEIBO = "weiBo";
+
+    private boolean hasClicked = false;
+
     private boolean hasShaken = false; //判断是否已经摇晃的标志位
+
+    private String[] wishTexts;//默认祝福语
 
     private Util util;
 
-    private String[] wishTexts;//默认祝福语
+    private IWeiboShareAPI mWeiBoShareAPI;//微博微博分享接口实例
+    private WeiBoShareUtil weiBoShareUtil;
+    private WeChatShareUtil weChatShareUtil;
+
+    private Button mWeChatShareTimeLine;
+    private Button mWeChatShareFriend;
+    private Button mWeiBoShare;
+
+    private EditText mWishText;
+
+    private ImageView mPhoto;
+
+    private Sensor mSensor;
+    private SensorManager mSensorManager;
+
+    private SlidingMenu slidingMenu;
+
+    private TextView mTextLength;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,7 +119,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
 
     @Override
     public void onBackPressed() {
-        if(slidingMenu.isMenuShowing()) {
+        if (slidingMenu.isMenuShowing()) {
             slidingMenu.showContent();
         } else {
             //当APP没有被kill时只显示1次启动界面
@@ -278,7 +282,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWeChatShareTimeLine.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                checkWifiAvailabilityAndShareForWeChat(0);
+                checkWifiAvailabilityAndShare(SHARE_TYPE_WECHAT, 0);
             }
         });
 
@@ -286,7 +290,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWeChatShareFriend.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                checkWifiAvailabilityAndShareForWeChat(1);
+                checkWifiAvailabilityAndShare(SHARE_TYPE_WECHAT, 1);
             }
         });
 
@@ -294,7 +298,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         mWeiBoShare.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                checkWifiAvailabilityAndShareForWeiBo();
+                checkWifiAvailabilityAndShare(SHARE_TYPE_WEIBO, 1);
             }
         });
 
@@ -305,26 +309,9 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         slidingMenu.setBehindWidth(menuWidth);//菜单的宽度
         slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);//菜单全屏都可滑出
         slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
-        slidingMenu.setFocusable(true);
         slidingMenu.setMenu(R.layout.menu_layout);
-        slidingMenu.setFadeEnabled(true);
-        slidingMenu.setFadeDegree(0.35f);
 
-        TextView mHelp, mAbout, mFeedback;
-
-        mHelp = (TextView) findViewById(R.id.help);
-        mHelp.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideSlidingMenu();
-                MaterialDialog.Builder mBuilder = new MaterialDialog.Builder(mContext);
-                mBuilder.theme(Theme.LIGHT)
-                        .title(R.string.info)
-                        .content(R.string.gesture_instruction)
-                        .cancelable(true)
-                        .show();
-            }
-        });
+        TextView mAbout, mFeedback, mHelp;
 
         mAbout = (TextView) findViewById(R.id.about);
         mAbout.setOnClickListener(new OnClickListener() {
@@ -366,6 +353,20 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                 hideSlidingMenu();
                 Intent intent = new Intent(mContext, FeedbackActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        mHelp = (TextView) findViewById(R.id.help);
+        mHelp.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideSlidingMenu();
+                MaterialDialog.Builder mBuilder = new MaterialDialog.Builder(mContext);
+                mBuilder.theme(Theme.LIGHT)
+                        .title(R.string.info)
+                        .content(R.string.gesture_instruction)
+                        .cancelable(true)
+                        .show();
             }
         });
     }
@@ -552,59 +553,67 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == RESULT_OK) { //如果使用相机或图库返回成功
-            if (requestCode == Constants.REQ_ALBUM) { //如果使用系统图库
-                if (null != data) {
-                    mPhoto.setImageURI(data.getData());
-                }
-            } else if (requestCode == Constants.REQ_CAMERA) { //如果使用相机拍照
-                FileInputStream fis = null;
-                try {
-                    fis = new FileInputStream(photoPath); //获取照片的输入流
-                    Bitmap bitmap = BitmapFactory.decodeStream(fis); //从照片的输入流中将图片解码为Bitmap
-                    mPhoto.setImageBitmap(bitmap); //设置显示图片
-                    //询问是否将图片保存在图库
-                    MaterialDialog.Builder mBuilder = new MaterialDialog.Builder(mContext);
-                    mBuilder.theme(Theme.LIGHT)
-                            .content(R.string.save_photo)
-                            .positiveText(R.string.yes)
-                            .negativeText(R.string.no)
-                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    util.showMessage(getString(R.string.save_hint), Toast.LENGTH_SHORT);
-                                    dialog.dismiss();
-                                }
-                            })
-                            .onNegative(new MaterialDialog.SingleButtonCallback() {//如果不保存
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    if (!Util.deleteFile(photoPath)) {
-                                        util.showMessage(getString(R.string.delete_fail), Toast.LENGTH_SHORT);
-                                    }
-                                    dialog.dismiss();
-                                }
-                            })
-                            .cancelable(false)
-                            .show();
-                } catch (Exception e) {
-                    util.showExceptionMsg(e);
-                } finally {
-                    try {
-                        if (null != fis) {
-                            fis.close();
+        switch (resultCode) {
+            case RESULT_OK: {//如果使用相机或图库返回成功
+                switch (requestCode) {
+                    case Constants.REQ_ALBUM: {//如果使用系统图库
+                        if (null != data) {
+                            mPhoto.setImageURI(data.getData());
                         }
-                    } catch (Exception e) {
-                        util.showExceptionMsg(e);
+                        break;
+                    }
+                    case Constants.REQ_CAMERA: {//如果使用相机拍照
+                        FileInputStream fis = null;
+                        try {
+                            fis = new FileInputStream(photoPath); //获取照片的输入流
+                            Bitmap bitmap = BitmapFactory.decodeStream(fis); //从照片的输入流中将图片解码为Bitmap
+                            mPhoto.setImageBitmap(bitmap); //设置显示图片
+                            //询问是否将图片保存在图库
+                            MaterialDialog.Builder mBuilder = new MaterialDialog.Builder(mContext);
+                            mBuilder.theme(Theme.LIGHT)
+                                    .content(R.string.save_photo)
+                                    .positiveText(R.string.yes)
+                                    .negativeText(R.string.no)
+                                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                        @Override
+                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                            util.showMessage(getString(R.string.save_hint), Toast.LENGTH_SHORT);
+                                            dialog.dismiss();
+                                        }
+                                    })
+                                    .onNegative(new MaterialDialog.SingleButtonCallback() {//如果不保存
+                                        @Override
+                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                            if (!Util.deleteFile(photoPath)) {
+                                                util.showMessage(getString(R.string.delete_fail), Toast.LENGTH_SHORT);
+                                            }
+                                            dialog.dismiss();
+                                        }
+                                    })
+                                    .cancelable(false)
+                                    .show();
+                        } catch (Exception e) {
+                            util.showExceptionMsg(e);
+                        } finally {
+                            try {
+                                if (null != fis) {
+                                    fis.close();
+                                }
+                            } catch (Exception e) {
+                                util.showExceptionMsg(e);
+                            }
+                        }
+                        break;
                     }
                 }
+                break;
             }
-        }
-
-        if (requestCode == Constants.REQ_DEFAULT) { //选择默认图片返回成功
-            if (resultCode == Constants.RES_DEFAULT) {
-                int picId = Integer.parseInt(data.getStringExtra("picId")); //获得所选图片id
-                mPhoto.setImageDrawable(util.getDrawable(picId));
+            case Constants.RES_DEFAULT: {//选择默认图片返回成功
+                if (requestCode == Constants.REQ_DEFAULT) {
+                    int picId = Integer.parseInt(data.getStringExtra("picId")); //获得所选图片id
+                    mPhoto.setImageDrawable(util.getDrawable(picId));
+                }
+                break;
             }
         }
     }
@@ -620,15 +629,32 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
     }
 
     /**
-     * 微信分享部分
+     * 根据分享类型，调用分享方法
+     *
+     * @param type 分享类型
+     * @param flag 微信分享的分享位置，微博分享时可以随意
      */
+    private void selectShareType(String type, int flag) {
+        switch (type) {
+            case SHARE_TYPE_WECHAT: {
+                weChatShare(flag);
+                break;
+            }
+            case SHARE_TYPE_WEIBO: {
+                weiBoShare();
+                break;
+            }
+        }
+    }
 
     /**
-     * 微信分享前检测是否使用wifi
+     * 检测是否处于wifi环境下并进行分享
      *
-     * @param flag 分享位置 0为分享到朋友圈 1为分享给微信好友
+     * @param type 分享类型
+     * @param flag 微信分享的分享位置，微博分享时可以随意
+     * @see {@link MainActivity#selectShareType}
      */
-    private void checkWifiAvailabilityAndShareForWeChat(final int flag) {
+    private void checkWifiAvailabilityAndShare(final String type, final int flag) {
         if (!util.checkWifiAvailability()) {
             MaterialDialog.Builder mBuilder = new MaterialDialog.Builder(mContext);
             mBuilder.theme(Theme.LIGHT)
@@ -638,7 +664,7 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                     .onPositive(new MaterialDialog.SingleButtonCallback() {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            weChatShare(flag);
+                            selectShareType(type, flag);
                             dialog.dismiss();
                         }
                     })
@@ -651,9 +677,13 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
                     .cancelable(false)
                     .show();
         } else {
-            weChatShare(flag);
+            selectShareType(type, flag);
         }
     }
+
+    /**
+     * 微信分享部分
+     */
 
     /**
      * 微信分享
@@ -665,40 +695,9 @@ public class MainActivity extends Activity implements IWeiboHandler.Response {
         setVisibility(View.VISIBLE);
     }
 
-
     /**
      * 微博分享部分
      */
-
-    /**
-     * 微博分享前检测是否使用wifi
-     */
-    private void checkWifiAvailabilityAndShareForWeiBo() {
-        if (!util.checkWifiAvailability()) {
-            MaterialDialog.Builder mBuilder = new MaterialDialog.Builder(mContext);
-            mBuilder.theme(Theme.LIGHT)
-                    .content(R.string.wifi_not_enabled)
-                    .positiveText(R.string.yes)
-                    .negativeText(R.string.no)
-                    .onPositive(new MaterialDialog.SingleButtonCallback() {
-                        @Override
-                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            weiBoShare();
-                            dialog.dismiss();
-                        }
-                    })
-                    .onNegative(new MaterialDialog.SingleButtonCallback() {
-                        @Override
-                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            dialog.dismiss();
-                        }
-                    })
-                    .cancelable(false)
-                    .show();
-        } else {
-            weiBoShare();
-        }
-    }
 
     /**
      * 微博分享
