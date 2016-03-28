@@ -105,11 +105,7 @@ public class MailTask extends AsyncTask<Integer, Integer, String> {
         mail.setSubject(subject);
         mail.setBody(body);
         try {
-            if (mail.send()) {
-                return "success";
-            } else {
-                return "fail";
-            }
+            return mail.send() ? "success" : "fail";
         } catch (Exception e) {
             return "exception";
         }
