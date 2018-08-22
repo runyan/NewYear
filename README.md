@@ -1,4 +1,4 @@
-## 制作贺年卡并分享给微信好友，微信朋友圈以及新浪微博
+## 制作贺年卡并分享给微信好友，微信朋友圈以及新浪微博  [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 ### 简介
 安卓APP 使用Android Studio开发<br/>
 基于慕课网
